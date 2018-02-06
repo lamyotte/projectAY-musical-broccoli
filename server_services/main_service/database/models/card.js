@@ -3,13 +3,10 @@ module.exports = (sequelize, DataTypes) => {
   var Card = sequelize.define('Card', {
     name: DataTypes.STRING,
     img: DataTypes.STRING,
-    specs: DataTypes.JSON
-  }, {
-    classMethods: {
-      associate: function(models) {
-        Card.belongsToMany(models.Deck, {through: 'CardDeck' });
-      }
-    }
+    specs: DataTypes.JSONB
   });
+  Card.associate = function (models) {
+    Card.belongsToMany(models.Deck, {through: 'Deck_Card' });
+  };
   return Card;
 };

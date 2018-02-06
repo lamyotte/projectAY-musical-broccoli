@@ -1,13 +1,10 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var Deck = sequelize.define('Deck', {}, {
-    classMethods: {
-      associate: function(models) {
-        Deck.belongsToMany(models.Card, {through: 'CardDeck' });
-        Deck.belongsTo(models.Player, {foreignKey: 'PlayerId'});
-        Deck.hasOne(model.Job, {foreignKey: 'JobId'});
-      }
-    }
-  });
+  var Deck = sequelize.define('Deck', {}, {});
+  Deck.associate = function(models) {
+    Deck.belongsToMany(models.Card, {through: 'Deck_Card'});
+    Deck.hasOne(models.Player, {foreignKey: 'id'});
+    Deck.hasOne(models.Job, {foreignKey: 'id'});
+  }
   return Deck;
 };

@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('CardDeck', {
+    return queryInterface.createTable('Deck_Card', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -22,11 +22,21 @@ module.exports = {
           model: 'Decks',
           key: 'id'
         }
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('NOW()')
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('NOW()')
       }
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('CardDeck');
+    return queryInterface.dropTable('Deck_Card');
   }
 };

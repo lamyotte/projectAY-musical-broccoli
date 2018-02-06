@@ -5,7 +5,7 @@ var Redis = require('ioredis');
 var redis = new Redis();
 var matchmaker = require('./matchmaker.js').matchmaker;
 
-var cards = require('./cards.json');
+const controllers = require('./database/controllers');
 
 var connections = {};               // Ongoing connections by id
 var waitingPlayers = [];            // Waiting list for players looking to play
@@ -19,7 +19,6 @@ var server = http.createServer(function(request, response) {
     response.end();
 });
 
-const controllers = require('./database/controllers');
 
 server.listen(3000, function() {
     console.log((new Date()) + ' Server is listening on port 3000');
@@ -33,8 +32,6 @@ wsServer = new WebSocketServer({
 setInterval(()=> {
     matchmaker(connections);
 }, 5000);
-
-test();
 
 /**
  * detect wether the specifier origin is allowed
@@ -78,17 +75,6 @@ wsServer.on('request', function(request) {
         // Consider garbage collector
     });
 });
-
-function test(){
-    controllers.players.create()
-        .then(() => {
-            return controllers.players.list();
-        })
-        .then((res) => {
-            console.log("HERRRREE");
-            console.log(res);
-        })
-}
 
 /**
  * Retrieves player connections and send start game signal
