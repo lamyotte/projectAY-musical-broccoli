@@ -1,33 +1,38 @@
 const Player = require('../models').Player;
-
-function formatMany(players) {
-  console.log(players);
-  let formattedPlayers =[];
-  for(let i = 0; i < players.length ; i++) {
-    formattedPlayers[i] = players[i].dataValues;
-  }
-  return formattedPlayers;
-}
-
-function formatOne(player) {
-  console.log(player);
-  console.log('/////////////////////////')
-  return player.dataValues;
-}
+const Deck = require('../models').Deck;
+const formatOne= require('./formatter').formatOne;
+const formatMany= require('./formatter').formatMany;
 
 module.exports = {
-  create(req, res) {
+  create(tag, mmr) {
     return Player
       .create({
-		GamerTag: 'Livvy',
-		MMR:25
+    		gamerTag: tag,
+    		MMR: mmr
       })
+      .then(formatOne)
       .catch(error => console.log(error));
   },
-  list(req, res) {
-  return Player
-    .all()
-    .then(formatMany)
-    .catch(error => console.log(error));
-},
+  list() {
+    return Player
+      .all()
+      .then(formatMany)
+      .catch(error => console.log(error));
+  },
+  getById(id) {
+    return Player.findById(id)
+      .then(formatOne);
+  },
+  getByTag(tag) {
+    return Player.findOne({
+        where: {
+          gamerTag: tag
+        }
+    })
+    .then(formatOne);
+  },
+  search(params) {
+    return Player.findAll({where: params})
+    .then(formatMany);
+  }
 };

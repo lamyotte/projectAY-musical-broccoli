@@ -3,7 +3,7 @@ var app = express()
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-app.use(express.static(__dirname + '/consoleClient'));
+app.use(express.static(__dirname + '/'));
 app.use(bodyParser.urlencoded({ 'extended': 'true' }));
 app.use(bodyParser.json());
 app.use(bodyParser.json({ type: 'application/vnd.api+json' }));

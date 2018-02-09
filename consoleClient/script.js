@@ -8,14 +8,44 @@ var currentPlayer = new Player("Livvy");
 var colors = { 
     default : 'black',
     serverMessage : 'blue',
+    authMessage : 'blue',
     sysMessage : 'darkblue',
-    actionMessage : 'darkred'
+    actionMessage : 'darkred',
+    errorMessage : 'red',
+    globalMessage: 'darkgreen'
 }
 
 window.onload = function() {
  //
 };
 
+function sendCommand() {
+    let command = document.getElementById('command').value
+    let partials = command.split(" ");
+    if(partials[0] == "connect") {
+        sendMessage({
+            target: 'authenticator',
+            message: {
+                command: 'connect',
+                tag: partials[1],
+                pwd: partials[2]
+            }
+        })
+    } 
+    else if(partials[0] == "get-decks") {
+        sendMessage({
+            target: 'global-manager',
+            message: {
+                command: partials[0],
+                playerId: 1
+            }
+        })
+    }
+}
+
+function sendMessage(message) {
+    connection.send(JSON.stringify(message));
+}
 connection.onopen = function() {
     //Temporary
     //Ask for new game as soon as connection is opened
@@ -23,7 +53,8 @@ connection.onopen = function() {
         playerId: currentPlayer.gamerId
     }
     connection.send(JSON.stringify({ 
-        type: "startGame", 
+        target: 'matchmaker', 
+        command: 'looking_to_play',
         data: gameRequest 
     }));
     writeToConsole("Connection sent...", 'sysMessage');
@@ -45,10 +76,17 @@ connection.onmessage = function(message) {
     try {
         let json = JSON.parse(message.data);
         console.log(json);
-        if(json.command === 'sys') {
-        writeToConsole(json.message, 'serverMessage');
-        } else if(json.command === 'startGame') {
-            writeToConsole("Opponent found, starting game now", 'actionMessage');
+        if(json.message.type == 'error') {
+            writeToConsole(JSON.stringify(json.message), 'errorMessage');
+        }
+        else if(json.issuer === 'sys') {
+            writeToConsole(json.message, 'serverMessage');
+        } 
+        else if(json.issuer == 'authenticator') {
+            writeToConsole(JSON.stringify(json.message), 'authMessage');
+        }
+        else if(json.issuer == 'global-manager') {
+            writeToConsole(JSON.stringify(json.message), 'globalMessage');
         }
         // handle incoming message
     } catch (e) {

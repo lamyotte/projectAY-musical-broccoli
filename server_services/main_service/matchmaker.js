@@ -1,17 +1,22 @@
+const players = require('./database/controllers/players');
+
 var waitList = [];
 
 /**
  * interval function to start games 
  * @param  {array} waitList list of waiting players
  */
-function matchmaker() {
+function matchmake() {
 	if(waitList.length > 1) {
 
 	}
 }
 
-function addWaitingPlayer(connection, id, deckId) {
-
+function addWaitingPlayer(connection, message) {
+	players.getByTag('Livvy')
+		.then((res) => {
+			console.log(res);
+		})
 }
 
 function getPlayerInfos(id) {
@@ -26,4 +31,21 @@ function removeWaitingPlayer(index = null, id = null) {
 
 	}
 }
-module.exports.matchmaker = matchmaker;
+
+function sendMessage(connection, message) {
+	connection.sendUTF(JSON.stringify({
+			issuer: 'matchmaker',
+            message: message
+    }));
+}
+function route (connection, message) {
+	switch (message.command) {
+		case 'looking_to_play':
+			addWaitingPlayer(connection,message);
+	}
+}
+
+module.exports = {
+	route,
+	matchmake
+}

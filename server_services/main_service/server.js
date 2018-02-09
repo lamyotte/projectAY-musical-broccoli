@@ -1,9 +1,11 @@
 var WebSocketServer = require('websocket').server;
 
 var http = require('http');
-var Redis = require('ioredis');
-var redis = new Redis();
-var matchmaker = require('./matchmaker.js').matchmaker;
+//var Redis = require('ioredis');
+//var redis = new Redis();
+var matchmaker = require('./matchmaker.js').route;
+var authentication_module = require('./authentication_module.js').route;
+var global_manager = require('./global_manager.js').route;
 
 const controllers = require('./database/controllers');
 
@@ -28,10 +30,6 @@ wsServer = new WebSocketServer({
     httpServer: server,
     autoAcceptConnections: false
 });
-
-setInterval(()=> {
-    matchmaker(connections);
-}, 5000);
 
 /**
  * detect wether the specifier origin is allowed
@@ -60,7 +58,16 @@ wsServer.on('request', function(request) {
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
         	let request = JSON.parse(message.utf8Data);
-            switch(request.type) {
+            switch(request.target) {
+                case 'matchmaker':
+                    matchmaker(connection, request);
+                    break;
+                case 'authenticator':
+                    authentication_module(connection, request.message);
+                    break;
+                case 'global-manager':
+                    global_manager(connection, request.message);
+                    break;
                 case 'startGame':
                     startGame(connection, request, currentId);
                     break;
@@ -93,10 +100,6 @@ function startGame(connection, request, id){
             'ID' : id, 
             'data' : request.data
         });
-        redis.set('test', 1111);
-        redis.get('test').then(( result) => {
-            console.log(result);
-        })
     } else {
         let opponent = waitingPlayers[0];
         waitingPlayers.splice(0,1);
@@ -120,16 +123,4 @@ function startGame(connection, request, id){
         nextGameId++;
         console.log(waitingPlayers);
     }
-}
-
-function changeStarterCards(){
-
-}
-
-function drawCard(){
-
-}
-
-function playCard(){
-
 }

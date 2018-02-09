@@ -4,5 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     gamerTag: DataTypes.STRING,
     MMR: DataTypes.INTEGER
   }, {});
+  Player.associate = function(models) {
+    Player.hasMany(models.Deck);
+  }
   return Player;
 };

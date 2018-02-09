@@ -5,5 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     img: DataTypes.STRING,
     specs: DataTypes.JSONB
   }, {});
+  Job.associate = function(models) {
+    Job.hasMany(models.Deck);
+  }
   return Job;
 };
