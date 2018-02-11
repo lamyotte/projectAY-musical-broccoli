@@ -1,6 +1,6 @@
 class Player{
-	constructor(gamerTag){
-		this.gamerTag = gamerTag;
-		this.gamerId = Math.floor(Math.random() * (999 - 100) + 100);
+	constructor(data){
+		this.tag = data.tag;
+		this.id = data.id;
 	}
 }

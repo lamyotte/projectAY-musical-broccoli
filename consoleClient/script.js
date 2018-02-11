@@ -3,7 +3,7 @@ window.WebSocket = window.WebSocket || window.MozWebSocket;
 var connection = new WebSocket('ws://127.0.0.1:3000', 'echo-protocol');
 
 
-var currentPlayer = new Player("Livvy");
+var currentPlayer;
 
 var colors = { 
     default : 'black',
@@ -34,13 +34,18 @@ function sendCommand() {
         })
     } 
     else if(partials[0] == "get-decks") {
-        sendMessage({
-            target: 'global-manager',
-            message: {
-                command: partials[0],
-                playerId: 1
-            }
-        })
+        if(typeof(currentPlayer) !== 'undefined') {
+            sendMessage({
+                target: 'global-manager',
+                message: {
+                    command: partials[0],
+                    playerId: currentPlayer.id
+                }
+            })
+        } 
+        else {
+            writeToConsole('Please connect with user', 'errorMessage');
+        }
     }
 }
 
@@ -50,16 +55,7 @@ function sendMessage(message) {
 connection.onopen = function() {
     //Temporary
     //Ask for new game as soon as connection is opened
-    let gameRequest = {
-        playerId: currentPlayer.gamerId
-    }
-    connection.send(JSON.stringify({ 
-        target: 'matchmaker', 
-        command: 'looking_to_play',
-        data: gameRequest 
-    }));
-    writeToConsole("Connection sent...", 'sysMessage');
-    writeToConsole("Please wait for oponent...", 'sysMessage');
+    writeToConsole("Server connection opened, input command ...", 'sysMessage');
 };
 
 connection.onerror = function(error) {
@@ -71,9 +67,6 @@ connection.onerror = function(error) {
  * @param  {string} message message to parse
  */
 connection.onmessage = function(message) {
-    console.log("Here");
-    console.log(message);
-    // try to decode json
     try {
         let json = JSON.parse(message.data);
         console.log(json);
@@ -85,6 +78,7 @@ connection.onmessage = function(message) {
         } 
         else if(json.issuer == 'authenticator') {
             writeToConsole(JSON.stringify(json.message), 'authMessage');
+            login(json.message);
         }
         else if(json.issuer == 'global-manager') {
             writeToConsole(JSON.stringify(json.message), 'globalMessage');
@@ -95,6 +89,11 @@ connection.onmessage = function(message) {
         return;
     }
 };
+
+function login(data) {
+    if(data.hasOwnProperty('gamerTag'))
+        currentPlayer = new Player(data);
+}
 
 /**
  * writes given message to screen
