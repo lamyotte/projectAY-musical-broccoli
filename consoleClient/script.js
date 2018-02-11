@@ -21,6 +21,7 @@ window.onload = function() {
 
 function sendCommand() {
     let command = document.getElementById('command').value
+    writeToConsole(command, 'default');
     let partials = command.split(" ");
     if(partials[0] == "connect") {
         sendMessage({

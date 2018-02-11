@@ -5,12 +5,11 @@ const formatter = require('./formatter');
 
 
 function format(decks) {
-  console.log(decks);
   let formattedElements =[];
   for(let i = 0; i < decks.length ; i++) {
     formattedElements[i] = decks[i].dataValues;
-    formattedElements[i].cards = formatter.formatMany(decks[i].cards);
-    formattedElements[i].job = decks[i].job.dataValues;
+    formattedElements[i].Cards = formatter.formatMany(decks[i].Cards);
+    formattedElements[i].Job = decks[i].Job.dataValues;
   }
   return formattedElements;
 }
@@ -34,15 +33,14 @@ module.exports = {
       .catch(error => console.log(error));
   },
   getByPlayer(playerId) {
-    console.log(playerId);
     return Deck
       .findAll({
         where: {
           PlayerId : playerId
         },
-        include: [{
+        include: [Card, {
           model: Job,
-          as: 'JobId'
+          as: 'Job'
         }]
       })
       .then(format);
