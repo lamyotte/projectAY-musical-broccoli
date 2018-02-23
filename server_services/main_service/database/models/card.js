@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     specs: DataTypes.JSONB
   });
   Card.associate = function (models) {
-    Card.belongsToMany(models.Deck, {through: 'Deck_Card' });
+    Card.belongsToMany(models.Deck, {through: 'Deck_Cards', foreignKey: 'CardId' });
   };
   return Card;
 };

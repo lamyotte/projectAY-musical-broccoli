@@ -4,21 +4,22 @@ const decks = require('./database/controllers/decks');
 function getDeck(connection, message) {
 	decks.getByPlayer(message.playerId)
 		.then((res) => {
-			sendMessage(connection, res);
+			sendMessage(connection, message.command, res);
 		})
 		.catch((err) => {
 			console.log(err);
-			sendMessage(connection, {
+			sendMessage(connection, message.command, {
 				type: "error",
 				error : err
 			})
 		})
 }
 
-function sendMessage(connection, message) {
+function sendMessage(connection, command, message) {
 	connection.sendUTF(JSON.stringify({
 			issuer: 'global-manager',
-            message: message
+            message: message,
+            command: command
     }));
 }
 

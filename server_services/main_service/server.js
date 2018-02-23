@@ -6,6 +6,7 @@ var http = require('http');
 var matchmaker = require('./matchmaker.js').route;
 var authentication_module = require('./authentication_module.js').route;
 var global_manager = require('./global_manager.js').route;
+var game = require('./game_manager.js');
 
 const controllers = require('./database/controllers');
 
@@ -60,16 +61,13 @@ wsServer.on('request', function(request) {
         	let request = JSON.parse(message.utf8Data);
             switch(request.target) {
                 case 'matchmaker':
-                    matchmaker(connection, request);
+                    matchmaker(connection, request.message);
                     break;
                 case 'authenticator':
                     authentication_module(connection, request.message);
                     break;
                 case 'global-manager':
                     global_manager(connection, request.message);
-                    break;
-                case 'startGame':
-                    startGame(connection, request, currentId);
                     break;
             }
             console.log('Received Message: ' + message.utf8Data);

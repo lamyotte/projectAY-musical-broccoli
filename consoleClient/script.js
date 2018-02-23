@@ -7,21 +7,16 @@ var currentPlayer;
 
 var colors = { 
     default : 'black',
-    serverMessage : 'blue',
-    authMessage : 'blue',
-    sysMessage : 'darkblue',
-    actionMessage : 'darkred',
-    errorMessage : 'red',
-    globalMessage: 'darkgreen'
+    data: 'blue',
+    error: 'red'
 }
 
 window.onload = function() {
- //
 };
 
 function sendCommand() {
     let command = document.getElementById('command').value
-    writeToConsole(command, 'default');
+    writeToConsole(command);
     let partials = command.split(" ");
     if(partials[0] == "connect") {
         sendMessage({
@@ -44,18 +39,46 @@ function sendCommand() {
             })
         } 
         else {
-            writeToConsole('Please connect with user', 'errorMessage');
+            writeToConsole('Please connect with user', colors.error);
         }
+    }
+    else if(partials[0] == "get-cards") {
+        if(typeof(currentPlayer) !== 'undefined') {
+           let deck = currentPlayer.decks.find(x => x.id == partials[1]);
+           if(typeof(deck) != 'undefined')
+                writeToConsole(deck.displayCards(), colors.data);
+        } 
+        else {
+            writeToConsole('Please connect with user', colors.error);
+        }
+    }
+     else if(partials[0] == "start-game") {
+        if(partials.length != 2) {
+            writeToConsole('Please input deck id', colors.error)
+            return;
+        }
+        if(typeof(currentPlayer) === 'undefined') {
+            writeToConsole('Please connect with user', colors.error)
+            return;
+        }
+        sendMessage({
+            target: 'matchmaker',
+            message: {
+                command: partials[0],
+                playerId: currentPlayer.id,
+                deckId: partials[1]
+            }
+        })
+        
     }
 }
 
 function sendMessage(message) {
     connection.send(JSON.stringify(message));
 }
+
 connection.onopen = function() {
-    //Temporary
-    //Ask for new game as soon as connection is opened
-    writeToConsole("Server connection opened, input command ...", 'sysMessage');
+    writeToConsole("Server connection opened, input command ...", colors.default);
 };
 
 connection.onerror = function(error) {
@@ -71,24 +94,38 @@ connection.onmessage = function(message) {
         let json = JSON.parse(message.data);
         console.log(json);
         if(json.message.type == 'error') {
-            writeToConsole(JSON.stringify(json.message), 'errorMessage');
+            writeToConsole(JSON.stringify(json.message), colors.error);
         }
         else if(json.issuer === 'sys') {
-            writeToConsole(json.message, 'serverMessage');
+            writeToConsole(json.message, colors.data);
         } 
         else if(json.issuer == 'authenticator') {
-            writeToConsole(JSON.stringify(json.message), 'authMessage');
+            writeToConsole(JSON.stringify(json.message), colors.data);
             login(json.message);
         }
         else if(json.issuer == 'global-manager') {
-            writeToConsole(JSON.stringify(json.message), 'globalMessage');
+            if(json.command == 'get-decks') {
+                initDecks(json.message);
+            }
         }
+        else if(json.issuer === 'matchmaker') {
+            writeToConsole(json.message, colors.data);
+        } 
         // handle incoming message
     } catch (e) {
-        console.log('This doesn\'t look like a valid JSON: ', message.data);
+        console.log(e);
         return;
     }
 };
+
+function initDecks(data) {
+    let decks = [];
+    for(let i = 0; i < data.length; i++ ) {
+        decks[i] = new Deck(data[i]);
+    }
+    currentPlayer.decks = decks;
+    writeToConsole(currentPlayer.displayDecks(), colors.data);
+}
 
 function login(data) {
     if(data.hasOwnProperty('gamerTag'))
@@ -100,12 +137,10 @@ function login(data) {
  * @param  {string} message the given message
  * @param  {string} type    the message type for display purposes
  */
-function writeToConsole(message, type='default') {
+function writeToConsole(message, color=colors.default) {
     let p = document.createElement("P");                       
     let t = document.createTextNode(message);
-    if(colors.hasOwnProperty(type))
-        color = colors[type];
-        p.style.color = color;
+    p.style.color = color;
     p.appendChild(t);                                           
     document.getElementById("main").appendChild(p);    
 }
