@@ -16,9 +16,6 @@ function format(decks) {
 }
 
 function formatCards(cards) {
-  console.log("//////////////////////////////")
-  console.log(cards);
-  console.log("//////////////////////////////")
   let formattedCards = [];
   for(let j = 0; j < cards.length ; j++) {
       formattedCards[j] = cards[j].dataValues;
