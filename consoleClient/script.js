@@ -4,6 +4,7 @@ var connection = new WebSocket('ws://127.0.0.1:3000', 'echo-protocol');
 
 
 var currentPlayer;
+var game;
 
 var colors = { 
     default : 'black',
@@ -12,66 +13,91 @@ var colors = {
 }
 
 window.onload = function() {
+    let input = document.getElementById('command')
+    input.addEventListener("keyup", function(event) {
+        event.preventDefault();
+      if (event.keyCode === 13) {
+        // Trigger the button element with a click
+        sendCommand();
+      }
+    });
 };
 
 function sendCommand() {
     let command = document.getElementById('command').value
+    document.getElementById('command').value = '';
+    document.getElementById('command').focus();
+    command = command.trim();
     writeToConsole(command);
     let partials = command.split(" ");
-    if(partials[0] == "connect") {
-        sendMessage({
-            target: 'authenticator',
-            message: {
-                command: 'connect',
-                tag: partials[1],
-                pwd: partials[2]
-            }
-        })
-    } 
-    else if(partials[0] == "get-decks") {
-        if(typeof(currentPlayer) !== 'undefined') {
+    switch (partials[0]) {
+        case 'connect': 
             sendMessage({
-                target: 'global-manager',
+                target: 'authenticator',
                 message: {
-                    command: partials[0],
-                    playerId: currentPlayer.id
+                    command: 'connect',
+                    tag: partials[1],
+                    pwd: partials[2]
                 }
             })
-        } 
-        else {
-            writeToConsole('Please connect with user', colors.error);
-        }
-    }
-    else if(partials[0] == "get-cards") {
-        if(typeof(currentPlayer) !== 'undefined') {
-           let deck = currentPlayer.decks.find(x => x.id == partials[1]);
-           if(typeof(deck) != 'undefined')
-                writeToConsole(deck.displayCards(), colors.data);
-        } 
-        else {
-            writeToConsole('Please connect with user', colors.error);
-        }
-    }
-     else if(partials[0] == "start-game") {
-        if(partials.length != 2) {
-            writeToConsole('Please input deck id', colors.error)
-            return;
-        }
-        if(typeof(currentPlayer) === 'undefined') {
-            writeToConsole('Please connect with user', colors.error)
-            return;
-        }
-        sendMessage({
-            target: 'matchmaker',
-            message: {
-                command: partials[0],
-                playerId: currentPlayer.id,
-                deckId: partials[1]
+            break;
+        case 'get-decks':
+            if(typeof(currentPlayer) !== 'undefined') {
+                sendMessage({
+                    target: 'global-manager',
+                    message: {
+                        command: partials[0],
+                        playerId: currentPlayer.id
+                    }
+                })
+            } 
+            else {
+                writeToConsole('Please connect with user', colors.error);
             }
-        })
-        
+            break;
+        case 'get-cards': 
+             if(typeof(currentPlayer) !== 'undefined') {
+               let deck = currentPlayer.decks.find(x => x.id == partials[1]);
+               if(typeof(deck) != 'undefined')
+                    writeToConsole(deck.displayCards(), colors.data);
+            } 
+            else {
+                writeToConsole('Please connect with user', colors.error);
+            }
+            break;
+        case 'start-game':
+            if(partials.length != 2) {
+                writeToConsole('Please input deck id', colors.error)
+                return;
+            }
+            if(typeof(currentPlayer) === 'undefined') {
+                writeToConsole('Please connect with user', colors.error)
+                return;
+            }
+            sendMessage({
+                target: 'matchmaker',
+                message: {
+                    command: partials[0],
+                    playerId: currentPlayer.id,
+                    deckId: partials[1]
+                }
+            })
+            break;
+        case 'swap-cards': 
+            let swap = partials.slice(1);
+            sendMessage({
+                target: 'game-manager',
+                message: {
+                    command: partials[0],
+                    gameId: game.gameId,
+                    playerId: currentPlayer.id,
+                    swaps: swap
+                }
+            })
+            break;
     }
 }
+
 
 function sendMessage(message) {
     connection.send(JSON.stringify(message));
@@ -93,7 +119,7 @@ connection.onmessage = function(message) {
     try {
         let json = JSON.parse(message.data);
         console.log(json);
-        if(json.message.type == 'error') {
+        if(json.message.type == 'error' || json.command == 'error') {
             writeToConsole(JSON.stringify(json.message), colors.error);
         }
         else if(json.issuer === 'sys') {
@@ -110,6 +136,20 @@ connection.onmessage = function(message) {
         }
         else if(json.issuer === 'matchmaker') {
             writeToConsole(json.message, colors.data);
+        }
+        else if(json.issuer === 'game-manager') {
+            if(json.command == 'init-game') {
+                initGame(json.message);
+            }
+            else if(json.command == 'swap-cards') {
+                game.hand = json.message.local.hand;
+                writeToConsole("Cards swapped!", colors.data);
+                game.drawGame(writeToConsole);
+            }
+            else if(json.command == 'swap-cards-completed') {
+                writeToConsole("Adversary swapped " + json.message + " cards", colors.data);
+                writeToConsole("Begin game", colors.data);
+            }
         } 
         // handle incoming message
     } catch (e) {
@@ -117,6 +157,11 @@ connection.onmessage = function(message) {
         return;
     }
 };
+
+function initGame(data) {
+    game = new Game(data);
+    game.drawGame(writeToConsole);
+}
 
 function initDecks(data) {
     let decks = [];

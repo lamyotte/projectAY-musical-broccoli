@@ -16,7 +16,6 @@ function matchmake() {
 
 
 function addWaitingPlayer(connection, message) {
-	console.log("OK?")
 	waitList.push({
 		id: message.playerId,
 		deckId: message.deckId,

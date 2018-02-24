@@ -6,7 +6,7 @@ var http = require('http');
 var matchmaker = require('./matchmaker.js').route;
 var authentication_module = require('./authentication_module.js').route;
 var global_manager = require('./global_manager.js').route;
-var game = require('./game_manager.js');
+var game_manager = require('./game_manager.js').route;
 
 const controllers = require('./database/controllers');
 
@@ -68,6 +68,9 @@ wsServer.on('request', function(request) {
                     break;
                 case 'global-manager':
                     global_manager(connection, request.message);
+                    break;
+                case 'game-manager':
+                    game_manager(connection, request.message);
                     break;
             }
             console.log('Received Message: ' + message.utf8Data);
