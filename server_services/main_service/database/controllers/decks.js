@@ -32,7 +32,6 @@ function formatOne(deck) {
   delete formattedElement.updatedAt;
   return formattedElement;
 }
-
 module.exports = {
   create(playerId,jobId,cards) {
     return Deck

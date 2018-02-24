@@ -48,6 +48,8 @@ function route (connection, message) {
 	console.log(message);
 	switch (message.command) {
 		case 'start-game':
+	switch (message.command) {
+		case 'looking_to_play':
 			addWaitingPlayer(connection,message);
 	}
 }

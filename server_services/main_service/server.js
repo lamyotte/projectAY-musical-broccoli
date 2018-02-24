@@ -8,6 +8,7 @@ var authentication_module = require('./authentication_module.js').route;
 var global_manager = require('./global_manager.js').route;
 var game_manager = require('./game_manager.js').route;
 
+
 const controllers = require('./database/controllers');
 
 var connections = {};               // Ongoing connections by id
