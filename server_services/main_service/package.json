@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
@@ -20,5 +20,8 @@
     "redis": "^2.8.0",
     "sequelize": "^4.32.2",
     "websocket": "^1.0.23"
+  },
+  "devDependencies": {
+    "mocha": "^5.0.1"
   }
 }
