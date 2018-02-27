@@ -95,13 +95,11 @@ function initGame(player1, player2) {
 }
 
 function swapCards(connection, message) {
-	console.log("yep");
 	db.get(message.gameId)
 		.then((data) => {
 			let gameData = JSON.parse(data.toString());
 			let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
 			if (gameData[player].hasOwnProperty('swapped')) {
-				console.log("swapped already");
 				sendMessage(connections[gameData[player].id], 'error', 'Cards already swapped please wait');
 				return;
 			}
@@ -184,22 +182,80 @@ function playCard(connection, message) {
 	// remove cost from mana
 	// 
 	// send updates
+	db.get(message.gameData)
+	.then((data) => {
+		let gameData = JSON.parse(data.toString());
+		let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
+		let index;
+		if (player != gameData.playing) {
+			sendMessage(connections[gameData[player].id], 'error', 'Wait your turn to play');
+			return;
+		}
+		index = gameData[player].hand.findIndex(x => x.id == message.card);
+		if (!isCardValid(index, gameData, player))
+			return;
+
+		if (gameData[player].hand[index].type == 'creature') {
+			gameData[player].board.splice(message.index, 0, gameData[player].hand[index]);
+			gameData[player].board[message.index].cHP = gameData[player].board[message.index].HP;
+			gameData[player].board[message.index].cAtk = gameData[player].board[message.index].Atk;
+			gameData[player].board[message.index].actions = 0;
+
+			// check sides bonus
+			// check board wide bonus
+			
+			if (gameData[player].board[message.index].specs.abilities.hasOwnProperty('battlecry')) {
+				let battlecry = gameData[player].board[message.index].specs.abilities.battlecry;
+				if (battlecry.type == 'charge') {
+					gameData[player].board[message.index].actions += 1;;
+				} else if (battlecry.type == 'heal') {
+
+				} else if (battlecry.type == 'dmg') {
+					
+				} else if (battlecry.type == 'draw') {
+					gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
+				}
+			}
+
+		}
+
+	})
 }
 
-function validateCard(cardId, gameData) {
-	let card = gameData[gameData.playing].hand.filter(curr => (curr.id === cardId));
-	if (!card)
-		return false; 
-	if (gameData[gameData.playing].mana - card.cost < 0)
-		return false;
-	if (card.type == 'creature')
-		if (gameData[gameData.playing].board.length == maxBoardSize)
-			return false;
-	else if (card.type == 'weapon')
-		if (Object.keys(gameData[gameData.playing].weapon ).length !== 0)
-			return false;
-	return true;
+function dmgTarget(potency, target, playerData) {
+	let creature = playerData.board[target];
+	creature.cHP -= potency;
+	if (creature.cHP <= 0) {
+		playerData.board.splice(target,1);
+		playerData.graveward.push(creature);
+	}
+}
 
+function healTarget(potency, target) {
+
+}
+
+
+function isCardValid(index, gameData, player) {
+	if (index == -1) {
+		sendMessage(connections[gameData[player].id], 'error', 'Card not in hand');
+		return false;
+	}
+	if (gameData[player].mana - gameData[player].hand[index].cost < 0) {
+		sendMessage(connections[gameData[player].id], 'error', 'Not enough mana');
+		return false;
+	}
+	if ( gameData[player].hand[index].type == 'creature')
+		if (gameData[player].board.length == maxBoardSize) {
+			sendMessage(connections[gameData[player].id], 'error', 'No space for this creature');
+			return false;
+		}
+	else if ( gameData[player].hand[index].type == 'weapon')
+		if (Object.keys(gameData[player].weapon ).length !== 0) {
+			sendMessage(connections[gameData[player].id], 'error', 'Already have a weapon');
+			return false;
+		}
+	return true;
 }
 
 

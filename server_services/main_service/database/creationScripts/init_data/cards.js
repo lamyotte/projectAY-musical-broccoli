@@ -5,6 +5,7 @@ const cards = [
             "HP" : "1",
             "Atk" : "2",
             "cost" : "1",
+            "type" : "creature",
             "abilities" : {
                 "battlecry" : {
                     "type" : "heal",
@@ -15,10 +16,11 @@ const cards = [
     },{
         "name" : "Spriggan",
         "specs" : {
-        "type" : "monster",
+        "family" : "monster",
         "HP" : "1",
         "Atk" : "2",
         "cost" : "1",
+        "type" : "creature",
         "abilities" : {
             "battlecry" : {
                 "type" : "charge"
@@ -28,20 +30,22 @@ const cards = [
     },{
         "name" : "Sylvan Sough",
         "specs" : {
-        "type" : "sylph",
+        "family" : "sylph",
         "HP" : "1",
         "Atk" : "2",
         "cost" : "1",
+        "type" : "creature",
         "abilities" : {  
         }
     }
     },{
         "name" : "Raptor",
         "specs" : {
-        "type" : "monster",
+        "family" : "monster",
         "HP" : "3",
         "Atk" : "2",
         "cost" : "2",
+        "type" : "creature",
         "abilities" :{
         }
     }
@@ -51,6 +55,7 @@ const cards = [
         "HP" : "1",
         "Atk" : "1",
         "cost" : "2",
+        "type" : "creature",
         "abilities" : {
             "battlecry" : {
                 "type" : "draw",
@@ -61,10 +66,11 @@ const cards = [
     },{
         "name" : "Ahriman",
         "specs" : {
-        "type" : "monster",
+        "family" : "monster",
         "HP" : "2",
         "Atk" : "3",
         "cost" : "2",
+        "type" : "creature",
         "abilities" : {
         }
     }
@@ -74,6 +80,7 @@ const cards = [
         "HP" : "1",
         "Atk" : "3",
         "cost" : "3",
+        "type" : "creature",
         "abilities" : {
             "battlecry" : {
                 "type" : "charge"
@@ -86,6 +93,7 @@ const cards = [
         "HP" : "2",
         "Atk" : "2",
         "cost" : "3",
+        "type" : "creature",
         "abilities" : {
             "bonus" : {
                 "type" : "atk",
@@ -99,6 +107,7 @@ const cards = [
         "HP" : "1",
         "Atk" : "5",
         "cost" : "3",
+        "type" : "creature",
         "abilities" : {
         }
     }
@@ -108,6 +117,7 @@ const cards = [
         "HP" : "5",
         "Atk" : "3",
         "cost" : "4",
+        "type" : "creature",
         "abilities" : {
             "taunt" : ""
         }
@@ -115,10 +125,11 @@ const cards = [
     },{
         "name" : "Adamantoise",
         "specs" : {
-        "type" : "monster",
+        "family" : "monster",
         "HP" : "7",
         "Atk" : "2",
         "cost" : "4",
+        "type" : "creature",
         "abilities" : {
         }
     }
@@ -128,6 +139,7 @@ const cards = [
         "HP" : "4",
         "Atk" : "4",
         "cost" : "5",
+        "type" : "creature",
         "abilities" : {
             "battlecry" : {
                 "type" : "dmg",
@@ -142,6 +154,7 @@ const cards = [
         "HP" : "2",
         "Atk" : "5",
         "cost" : "6",
+        "type" : "creature",
         "abilities" : {
             "battlecry" : {
                 "type" : "charge"
@@ -154,6 +167,7 @@ const cards = [
         "HP" : "7",
         "Atk" : "6",
         "cost" : "6",
+        "type" : "creature",
         "abilities" : {
         }
     }
