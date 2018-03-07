@@ -1,10 +1,13 @@
 var assert = require('assert');
 describe('EndTurn tests', () => {
-  describe('EndTurn no actions', () => {
-    it('should return -1 when the value is not present', () => {
+  describe('EndTurn', () => {
+    it('should end turn on empty boards', () => {
       assert.equal([1,2,3].indexOf(4), -1);
     });
-    it('should return -1 when the value is not present', () => {
+    it('should end turn with creatures on board', () => {
+      assert.equal([1,2,3].indexOf(4), -1);
+    });
+    it('should end turn with end turn special', () => {
       assert.equal([1,2,3].indexOf(4), -1);
     });
   });
