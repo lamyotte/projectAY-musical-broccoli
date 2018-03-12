@@ -30,13 +30,12 @@ class Game{
 		let str = '';
 		for (let i = 0; i < arr.length; i++) {
 			str += '  [ ';
-			str += arr[i].id + ' ';
+			str += arr[i].uid + ' ';
 			str += arr[i].name + ' ';
 			str += arr[i].specs.HP + 'HP ';
 			str += arr[i].specs.Atk + 'ATK ';
 			str += arr[i].specs.cost + 'Cost ';
-			if(arr[i].specs.hasOwnProperty('type'))
-				str += arr[i].specs.type + 'Type ';
+			str += arr[i].specs.type + 'Type ';
 			str += JSON.stringify(arr[i].specs.abilities);
 			str += ']';
 		}

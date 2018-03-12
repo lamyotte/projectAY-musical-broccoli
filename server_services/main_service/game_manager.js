@@ -94,132 +94,111 @@ function initGame(player1, player2) {
 	
 }
 
-function swapCards(connection, message) {
-	db.get(message.gameId)
-		.then((data) => {
-			let gameData = JSON.parse(data.toString());
-			let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
-			if (gameData[player].hasOwnProperty('swapped')) {
-				sendMessage(connections[gameData[player].id], 'error', 'Cards already swapped please wait');
-				return;
-			}
-			let swappedCards = [];
-			for (let i = 0; i < message.swaps.length; i++) {
-				let index = gameData[player].hand.findIndex(x => x.id == message.swaps[i]);
-				swappedCards.push(gameData[player].hand[index]);
-				gameData[player].hand.splice(index, 1, drawCards(gameData[player].deck)[0]);
-			}
-			gameData[player].deck.push(swappedCards);
-			gameData[player].swapped = swappedCards.length;
-			sendMessage(connections[gameData[player].id], 'swap-cards', {
-				id: message.id,
-				local: {
-					hand: gameData[player].hand
-				}
-			});
-			console.log(gameData[player].swapped);
-			if(gameData.player1.hasOwnProperty('swapped') && gameData.player2.hasOwnProperty('swapped')) {
-				sendMessage(connections[gameData.player1.id], 'swap-cards-completed', gameData.player2.swapped);
-				sendMessage(connections[gameData.player2.id], 'swap-cards-completed', gameData.player1.swapped);
-			}
-			return db.put(message.gameId, JSON.stringify(gameData));
-		})
-}
-
-function endTurn(connection, message) {
-	///TODO 
-	///validate connection data
-	/// {
-	/// 	gameId : ...
-	/// }
-	let gameData;
-	db.get(message.gameId)
-	.then((data) => {
-		gameData = data;
-		// Do end turn actions !
-		performBatchActions(gameData);
-		// New turn setup
-		gameData.playing = (gameData.playing == 'player1') ? 'player2' : 'player1';
-		gameData[gameData.playing].manapool = (gameData[gameData.playing].manapool < 10) ? 
-												gameData[gameData.playing].manapool + 1 : 
-												gameData[gameData.playing].manapool; 
-		gameData[gameData.playing].hand.push(drawCards(gameData[gameData.playing].deck, 1));
-		// Do begin turn actions
-		performBatchActions(gameData);
-		return db.put(lastId, JSON.stringify(gameData));
-	})
-	.then(() => {
-		sendMessage(connections[gameData.player1.id], 'update-game', gameData);
-		sendMessage(connections[gameData.player1.id], 'update-game', gameData);
-		sendMessage(connections[gameData.playing], 'start-turn', gameData);
-	})
-}
-
-function playCard(connection, message) {
-	// validate connection
-	// check if player has card in hand
-	// check if player has enough mana left 
-	// if creature card
-	// 	check if the board has enough place left
-	// if weapon card
-	//  check if weapon already equiped
-	// if spell card 
-	// 	nothing
-	// 	
-	// play the card 
-	// if creature card 
-	//   place on board at good index
-	//   check side bonus
-	//   check board wide bonus 
-	//   check battlecry
-	// if weapon
-	// 	 place on weapon slot
-	// if spell card
-	// 	 check target 
-	// 	 apply spell
-	// 
-	// remove card from hand
-	// remove cost from mana
-	// 
-	// send updates
-	db.get(message.gameData)
-	.then((data) => {
-		let gameData = JSON.parse(data.toString());
-		let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
-		let index;
-		if (player != gameData.playing) {
-			sendMessage(connections[gameData[player].id], 'error', 'Wait your turn to play');
-			return;
+function swapCards(message, gameData, sendMessage=sendMessage) {
+	let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
+	if (gameData[player].hasOwnProperty('swapped')) {
+		sendMessage(connections[gameData[player].id], 'error', 'Cards already swapped please wait');
+		return;
+	}
+	let swappedCards = [];
+	for (let i = 0; i < message.swaps.length; i++) {
+		let index = gameData[player].hand.findIndex(x => x.id == message.swaps[i]);
+		swappedCards.push(gameData[player].hand[index]);
+		gameData[player].hand.splice(index, 1, drawCards(gameData[player].deck)[0]);
+	}
+	gameData[player].deck.push(swappedCards);
+	gameData[player].swapped = swappedCards.length;
+	sendMessage(connections[gameData[player].id], 'swap-cards', {
+		id: message.id,
+		local: {
+			hand: gameData[player].hand
 		}
-		index = gameData[player].hand.findIndex(x => x.id == message.card);
-		if (!isCardValid(index, gameData, player))
-			return;
+	});
+	if(gameData.player1.hasOwnProperty('swapped') && gameData.player2.hasOwnProperty('swapped')) {
+		sendMessage(connections[gameData.player1.id], 'swap-cards-completed', gameData.player2.swapped);
+		sendMessage(connections[gameData.player2.id], 'swap-cards-completed', gameData.player1.swapped);
+	}
+}
 
-		if (gameData[player].hand[index].type == 'creature') {
-			gameData[player].board.splice(message.index, 0, gameData[player].hand[index]);
-			gameData[player].board[message.index].cHP = gameData[player].board[message.index].HP;
-			gameData[player].board[message.index].cAtk = gameData[player].board[message.index].Atk;
-			gameData[player].board[message.index].actions = 0;
+function endTurn(connection, message, gameData) {
+	// Do end turn actions !
+	performBatchActions(gameData);
+	// New turn setup
+	gameData.playing = (gameData.playing == 'player1') ? 'player2' : 'player1';
+	gameData[gameData.playing].manapool = (gameData[gameData.playing].manapool < 10) ? 
+											gameData[gameData.playing].manapool + 1 : 
+											gameData[gameData.playing].manapool; 
+	gameData[gameData.playing].hand.push(drawCards(gameData[gameData.playing].deck, 1));
+	// Do begin turn actions
+	performBatchActions(gameData);
+	sendMessage(connections[gameData.player1.id], 'update-game', gameData);
+	sendMessage(connections[gameData.player1.id], 'update-game', gameData);
+	sendMessage(connections[gameData.playing], 'start-turn', gameData);
+}
 
-			// check sides bonus
-			// check board wide bonus
+function playCard(message, gameData, sendMessage=sendMessage) {
+	let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
+	let index;
+	let card;
+
+	if (player != gameData.playing) {
+		sendMessage(connections[gameData[player].id], 'error', 'Wait your turn to play');
+		return;
+	}
+
+	index = gameData[player].hand.findIndex(x => x.id == message.card);
+	card = gameData[player].hand[index];
+
+	if (!isCardValid(index, gameData, player, sendMessage))
+		return;
+
+	switch (card.type) {
+		case 'creature' : 
+			playCreatureCard(gameData, index, message.index, player);
+			break;
+		case 'weapon' :
+			playWeapon(gameData, card, player);
+			break;
+		case 'spell' :
+			playSpellCard(gameData, message, player);
+			breakl
+	}
+
+	gameData[player].mana -= card.specs.cost;
+	gameData[player].hand.splice(index,1);
+}
+
+function playWeapon(gameData, weapon, player) {
+	gameData[player].weapon = weapon;
+	gameData[player].weapon.cDurability = gameData[player].weapon.Durability;
+
+}
+
+function playSpellCard(gameData, message) {
+	console.log('playing spell card');
+}
+ 
+function playCreatureCard(gameData, card, index, player) {
+	gameData[player].board.splice(index, 0, gameData[player].hand[card]);
+	gameData[player].board[index].cHP = gameData[player].board[index].specs.HP;
+	gameData[player].board[index].cAtk = gameData[player].board[index].specs.Atk;
+	gameData[player].board[index].actions = 0;
+
+	// check sides bonus
+	// check board wide bonus
+	
+	if (gameData[player].board[index].specs.abilities.hasOwnProperty('battlecry')) {
+		let battlecry = gameData[player].board[index].specs.abilities.battlecry;
+		if (battlecry.type == 'charge') {
+			gameData[player].board[index].actions += 1;;
+		} else if (battlecry.type == 'heal') {
+
+		} else if (battlecry.type == 'dmg') {
 			
-			if (gameData[player].board[message.index].specs.abilities.hasOwnProperty('battlecry')) {
-				let battlecry = gameData[player].board[message.index].specs.abilities.battlecry;
-				if (battlecry.type == 'charge') {
-					gameData[player].board[message.index].actions += 1;;
-				} else if (battlecry.type == 'heal') {
-
-				} else if (battlecry.type == 'dmg') {
-					
-				} else if (battlecry.type == 'draw') {
-					gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
-				}
-			}
-
+		} else if (battlecry.type == 'draw') {
+			gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
 		}
-
-	})
+	}
 }
 
 function dmgTarget(potency, target, playerData) {
@@ -236,7 +215,7 @@ function healTarget(potency, target) {
 }
 
 
-function isCardValid(index, gameData, player) {
+function isCardValid(index, gameData, player, sendMessage=sendMessage) {
 	if (index == -1) {
 		sendMessage(connections[gameData[player].id], 'error', 'Card not in hand');
 		return false;
@@ -258,7 +237,9 @@ function isCardValid(index, gameData, player) {
 	return true;
 }
 
-
+function attack(message, gameData, sendMessage=sendMessage) {
+	console.log("TO DO");
+}
 
 function performBatchActions(tempo) {
 	console.log("Performing batch actions");
@@ -287,17 +268,35 @@ function sendMessage(connection, command, message) {
     }));
 }
 
+function getGameData(message) {
+	return db.get(message.gameId)
+	.then((data) => {
+		return JSON.parse(data.toString());
+	})
+}
+
+function saveGameData(gameData, id) {
+	db.put(id, JSON.stringify(gameData));
+}
+
 function route (connection, message) {
 	console.log(message);
-	switch (message.command) {
-		case 'end-turn':
-			endTurn(connection,message);
-		case 'swap-cards':
-			swapCards(connection,message);
-	}
+	getGameData(message)
+	.then((gameData) => {
+		switch (message.command) {
+			case 'end-turn':
+				endTurn(message,gameData);
+			case 'swap-cards':
+				swapCards(message,gameData);
+		}
+		saveGameData(gameData, message.gameId);
+	})
 }
 
 module.exports = {
 	route,
-	initGame
+	initGame,
+	swapCards,
+	playCard,
+	attack
 }

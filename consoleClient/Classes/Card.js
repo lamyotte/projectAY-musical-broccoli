@@ -7,5 +7,6 @@ class Card{
 		this.atk = data.specs.Atk;
 		this.cost = data.specs.cost;
 		this.abilities = data.specs.abilities;
+		this.uid = data.uid;
 	}
 }
