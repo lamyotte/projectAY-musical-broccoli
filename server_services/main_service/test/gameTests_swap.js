@@ -18,6 +18,7 @@ describe('Swap Cards Test', () => {
     	assert.isTrue(gameData.player1.hand[1].id == 5);
     	assert.isTrue(gameData.player1.hand[2].uid == 3);
     	assert.isTrue(gameData.player1.swapped == 1);
+        assert.isTrue(gameData.player1.deck.length == 3);
     });
     it('should swap no card', () => {
     	let message = {
@@ -29,6 +30,7 @@ describe('Swap Cards Test', () => {
     	assert.isTrue(gameData.player1.hand[1].uid == 2);
     	assert.isTrue(gameData.player1.hand[2].uid == 3);
     	assert.isTrue(gameData.player1.swapped == 0);
+        assert.isTrue(gameData.player1.deck.length == 3);
     });
     it('should swap all cards', () => {
     	let message = {
@@ -40,6 +42,7 @@ describe('Swap Cards Test', () => {
     	assert.isTrue(gameData.player1.hand[1].id == 5);
     	assert.isTrue(gameData.player1.hand[2].id == 5);
     	assert.isTrue(gameData.player1.swapped == 3);
+        assert.isTrue(gameData.player1.deck.length == 3);
     });
     it('should fail when the user has already swapped', () => {
     	let message = {
@@ -58,6 +61,7 @@ describe('Swap Cards Test', () => {
     	assert.isTrue(gameData.player1.hand[1].uid == 2);
     	assert.isTrue(gameData.player1.hand[2].uid == 3);
     	assert.isTrue(gameData.player1.swapped == 1);
+        assert.isTrue(gameData.player1.deck.length == 3);
     });
   });
 });

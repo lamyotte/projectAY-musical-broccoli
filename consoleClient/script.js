@@ -95,6 +95,44 @@ function sendCommand() {
                 }
             })
             break;
+         case 'play-card': 
+            let card = partials[1];
+            let index = partials[2];
+            sendMessage({
+                target: 'game-manager',
+                message: {
+                    command: partials[0],
+                    gameId: game.gameId,
+                    playerId: currentPlayer.id,
+                    card: card,
+                    index: index
+                }
+            })
+            break;
+        case 'end-turn': 
+            sendMessage({
+                target: 'game-manager',
+                message: {
+                    command: partials[0],
+                    gameId: game.gameId,
+                    playerId: currentPlayer.id
+                }
+            })
+            break;
+        case 'attack': 
+            let attacker = partials[1];
+            let defender = partials[2];
+            sendMessage({
+                target: 'game-manager',
+                message: {
+                    command: partials[0],
+                    gameId: game.gameId,
+                    playerId: currentPlayer.id,
+                    defender: defender,
+                    attacker: attacker
+                }
+            })
+            break;
     }
 }
 
@@ -149,6 +187,45 @@ connection.onmessage = function(message) {
             else if(json.command == 'swap-cards-completed') {
                 writeToConsole("Adversary swapped " + json.message + " cards", colors.data);
                 writeToConsole("Begin game", colors.data);
+            }
+            else if(json.command == 'start-turn') {
+                game.manapool = json.message.manapool;
+                game.mana = json.message.mana;
+                game.hand = json.message.hand;
+                game.localDeck = json.message.deck;
+                game.drawGame(writeToConsole);
+                writeToConsole("Your turn!", colors.data);
+            }
+            else if(json.command == 'start-turn-adversary') {
+                game.adversaryManapool = json.message.manapool;
+                game.adversaryMana = json.message.mana;
+                game.adversaryDeck = json.message.deck;
+                game.adversaryHand = json.message.hand;
+                game.drawGame(writeToConsole);
+                writeToConsole("Waiting on adversary...", colors.data);
+            }
+            else if(json.command == 'update-game') {
+                if (json.message.hasOwnProperty('local')) {
+                    game.localBoard = json.message.local;
+                    game.hand = json.message.hand;
+                    game.mana = json.message.mana;
+                }
+                else {
+                    
+                    game.adversaryBoard = json.message.adversary;
+                    game.adversaryMana = json.message.mana;
+                    game.adversaryHand = json.message.hand;
+                }
+                game.drawGame(writeToConsole);
+            }
+            else if(json.command == 'update-board') {
+                game.localBoard = json.message.local;
+                game.adversaryBoard = json.message.adversary;
+                game.drawGame(writeToConsole);
+            }
+            else if(json.command == 'update-hp') {
+                game.HP = json.message.local;
+                game.adversaryHP = json.message.adversary;
             }
         } 
         // handle incoming message

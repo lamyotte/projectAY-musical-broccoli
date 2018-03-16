@@ -40,16 +40,18 @@ describe('Attack tests', () => {
 	});
     it('should kill defender', () => {
     	gameData.player1.board[0].cAtk = 999;
+      gameData.player1.board[0].cHP = 999;
+      gameData.player2.board[0].cAtk = 1;
 	    let message = {
-	        playerId: 1,
-	        defender: 12,
-	        attacker: 13
-      	};
-      	attack(message, gameData, (message) => {console.log(message)});
-      	assert.isTrue(gameData.player2.board.length == 0);
-      	assert.isTrue(gameData.player1.board.length == 1);
-      	assert.isTrue(gameData.player1.board[0].cHP == 1);
-      	assert.isTrue(gameData.player1.board[0].actions = 0);
+        playerId: 1,
+        defender: 12,
+        attacker: 13
+    	};
+    	attack(message, gameData, (message) => {console.log(message)});
+    	assert.isTrue(gameData.player2.board.length == 0);
+    	assert.isTrue(gameData.player1.board.length == 1);
+    	assert.isTrue(gameData.player1.board[0].cHP == 998);
+    	assert.isTrue(gameData.player1.board[0].actions == 0);
 
     });
     it('should kill attacker', () => {
@@ -109,7 +111,7 @@ describe('Attack tests', () => {
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player1.board[0].actions == 0);
       	assert.isTrue(gameData.player2.HP <= 0);
-      	assert.isTrue(gameData.status == 2);
+      	assert.isTrue(gameData.status == 3);
     });
     it('should fail to attack creature with blocking taunt', () => {
     	gameData.player1.board[0].cHP = 2;

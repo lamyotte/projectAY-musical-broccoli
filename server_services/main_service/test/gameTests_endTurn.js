@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
-var attack = require('../game_manager.js').attack;
-var endTurn = require('./data/gameDataDefault').endTurn;
+var endTurn = require('../game_manager.js').endTurn;
+var defaultGameData = require('./data/gameDataDefault').gameData;
 
 describe('EndTurn tests', () => {
   describe('EndTurn', () => {

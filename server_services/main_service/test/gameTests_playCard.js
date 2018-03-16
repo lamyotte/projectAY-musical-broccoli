@@ -30,11 +30,11 @@ describe('Play Card Tests', () => {
       // Check that the board is not empty anymore
       assert.isTrue(gameData.player1.board.length == 1);
       // Check that the card was placed
-      assert.equal(gameData.player1.board[0].id, 11);
+      assert.equal(gameData.player1.board[0].uid, 11);
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 0);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 11));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 11));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
     });
@@ -72,13 +72,13 @@ describe('Play Card Tests', () => {
       // Check that the board has 2 cards
       assert.isTrue(gameData.player1.board.length == 2);
       // Check that the card was placed
-      assert.equal(gameData.player1.board[0].id, 22);
+      assert.equal(gameData.player1.board[0].uid, 22);
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 0);
       // Check that the other card was moved
-      assert.equal(gameData.player1.board[1].id, 11);
+      assert.equal(gameData.player1.board[1].uid, 11);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 22));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
     });
@@ -129,7 +129,7 @@ describe('Play Card Tests', () => {
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 0);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 22));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
       // Check that the target card died
@@ -182,7 +182,7 @@ describe('Play Card Tests', () => {
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 0);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 22));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
       // Check that the target card is still there
@@ -237,7 +237,7 @@ describe('Play Card Tests', () => {
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 0);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 22));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
       // Check that the target card has healed to max hp
@@ -289,7 +289,7 @@ describe('Play Card Tests', () => {
       // Check that the card has no actions
       assert.equal(gameData.player1.board[0].actions, 1);
       // Check that the card was removed from hand
-      assert.isTrue(!gameData.player1.hand.some(card => card.id === 22));
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
     });
