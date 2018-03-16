@@ -197,8 +197,6 @@ connection.onmessage = function(message) {
                 writeToConsole("Your turn!", colors.data);
             }
             else if(json.command == 'start-turn-adversary') {
-                console.log("here")
-                console.log(json.message);
                 game.adversaryManapool = json.message.manapool;
                 game.adversaryMana = json.message.mana;
                 game.adversaryDeck = json.message.deck;
