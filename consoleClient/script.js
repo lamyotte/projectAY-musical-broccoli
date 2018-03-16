@@ -1,6 +1,6 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-var connection = new WebSocket('ws://127.0.0.1:3000', 'echo-protocol');
+var connection = new WebSocket('ws://192.168.137.1:3000', 'echo-protocol');
 
 
 var currentPlayer;
@@ -197,6 +197,8 @@ connection.onmessage = function(message) {
                 writeToConsole("Your turn!", colors.data);
             }
             else if(json.command == 'start-turn-adversary') {
+                console.log("here")
+                console.log(json.message);
                 game.adversaryManapool = json.message.manapool;
                 game.adversaryMana = json.message.mana;
                 game.adversaryDeck = json.message.deck;
@@ -211,7 +213,6 @@ connection.onmessage = function(message) {
                     game.mana = json.message.mana;
                 }
                 else {
-                    
                     game.adversaryBoard = json.message.adversary;
                     game.adversaryMana = json.message.mana;
                     game.adversaryHand = json.message.hand;
@@ -264,5 +265,6 @@ function writeToConsole(message, color=colors.default) {
     let t = document.createTextNode(message);
     p.style.color = color;
     p.appendChild(t);                                           
-    document.getElementById("main").appendChild(p);    
+    document.getElementById("main").appendChild(p); 
+    window.scrollTo(0,document.body.scrollHeight);  
 }

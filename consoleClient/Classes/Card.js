@@ -10,5 +10,7 @@ class Card{
 		this.type = data.type;
 		this.abilities = data.specs.abilities;
 		this.uid = data.uid;
+		this.cHP = data.specs.HP;
+		this.cAtk = data.specs.Atk;
 	}
 }

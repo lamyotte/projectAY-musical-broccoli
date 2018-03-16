@@ -144,6 +144,7 @@ function startGame(message, gameData, sendMessage) {
 }
 
 function endTurn(message, gameData, sendMessage) {
+	let notPlaying = (gameData.playing == 'player1') ? 'player1' : 'player2';
 	// Do end turn actions !
 	performBatchActions(gameData);
 	// New turn setup
@@ -161,10 +162,16 @@ function endTurn(message, gameData, sendMessage) {
 	performBatchActions(gameData);
 
 	sendMessage(connections[gameData[gameData.playing].id], 'start-turn',  {
-			mana: gameData[gameData.playing].mana,
-			manapool: gameData[gameData.playing].manapool,
-			hand: gameData[gameData.playing].hand,
-			deck: gameData[gameData.playing].deck.length
+		mana: gameData[gameData.playing].mana,
+		manapool: gameData[gameData.playing].manapool,
+		hand: gameData[gameData.playing].hand,
+		deck: gameData[gameData.playing].deck.length
+	});
+	sendMessage(connections[gameData[notPlaying].id], 'start-turn-adversary', {
+		mana: gameData[gameData.playing].mana,
+		manapool: gameData[gameData.playing].manapool,
+		hand: gameData[gameData.playing].hand.length,
+		deck: gameData[gameData.playing].deck.length
 	});
 }
 

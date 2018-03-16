@@ -19,28 +19,52 @@ class Game{
 	}
 
 	drawGame(writer) {
-
 		writer("Adversary : " + this.adversary + " Hand: " + this.adversaryHand + " Deck: " + this.adversaryDeck
 			+ " Mana: " + this.adversaryMana + "/" + this.adversaryManapool + " HP: " + this.adversaryHP);
-		writer("Board: " + this.createCardString(this.adversaryBoard));
-		writer("Your Board: " + this.createCardString(this.localBoard));
-		writer("Your Hand: " + this.createCardString(this.hand));
+		writer("Board: ");
+		for (let i = 0; i < this.adversaryBoard.length; i++) {
+			writer(this.createCardStringOnBoard(this.adversaryBoard[i]));
+		}
+		writer("Your Board:")
+		for (let i = 0; i < this.localBoard.length; i++) {
+			writer(this.createCardStringOnBoard(this.localBoard[i]));
+		}
+		writer("Your Hand: ");
+		for (let i = 0; i < this.hand.length; i++) {
+			writer(this.createCardStringHand(this.hand[i]));
+		}
 		writer("Local: " + this.local + " Deck: " + this.localDeck + " Mana: " + this.mana + "/" + this.manapool + " HP: " + this.HP);
 	}
 
-	createCardString(arr) {
+	createCardStringHand(card) {
 		let str = '';
-		for (let i = 0; i < arr.length; i++) {
-			str += '  [ ';
-			str += arr[i].uid + ' ';
-			str += arr[i].name + ' ';
-			str += arr[i].specs.HP + 'HP ';
-			str += arr[i].specs.Atk + 'ATK ';
-			str += arr[i].specs.cost + 'Cost ';
-			str += arr[i].type + 'Type ';
-			str += JSON.stringify(arr[i].specs.abilities);
-			str += ']';
-		}
+		str += '  [ ';
+		str += card.uid + ' ';
+		str += card.name + ' ';
+		str += card.specs.HP + 'HP ';
+		str += card.specs.Atk + 'ATK ';
+		str += card.specs.cost + 'Cost ';
+		str += card.type + 'Type ';
+		if (card.specs.hasOwnProperty('family'))
+			str += card.specs.family + 'Family ';
+		str += JSON.stringify(card.specs.abilities);
+		str += ']';
+		return str
+	}
+
+	createCardStringOnBoard(card) {
+		let str = '';
+		str += '  [ ';
+		str += card.uid + ' ';
+		str += card.name + ' ';
+		str += card.cHP + 'cHP ';
+		str += card.cAtk + 'cATK ';
+		str += card.specs.cost + 'Cost ';
+		str += card.type + 'Type ';
+		if (card.specs.hasOwnProperty('family'))
+			str += card.specs.family + 'Family ';
+		str += JSON.stringify(card.specs.abilities);
+		str += ']';
 		return str
 	}
 }
