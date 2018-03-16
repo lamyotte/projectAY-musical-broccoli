@@ -233,7 +233,7 @@ function playSpellCard(gameData, message) {
 }
  
 function playCreatureCard(gameData, card, index, player) {
-	console.log("PLAYING CREATURE CARD")
+	let adversary = (gameData.playing == 'player1') ? 'player2' : 'player1';
 	gameData[player].board.splice(index, 0, gameData[player].hand[card]);
 	gameData[player].board[index].cHP = gameData[player].board[index].specs.HP;
 	gameData[player].board[index].cAtk = gameData[player].board[index].specs.Atk;
@@ -248,26 +248,75 @@ function playCreatureCard(gameData, card, index, player) {
 		if (battlecry.type == 'charge') {
 			gameData[player].board[index].actions += 1;;
 		} else if (battlecry.type == 'heal') {
-
+			let target = findTarget(gameData, message.uid);
+			if (target == -1) {
+				/// invalid targe stop !
+			}
+			else {
+				healTarget(card.specs.abilities.battlecry.potency, target);	
+			}
 		} else if (battlecry.type == 'dmg') {
-			
+			let target = findTarget(gameData, message.uid);
+			if (target == -1) {
+				// invalid
+			}
+			else {
+				dmgTarget(card.specs.abilities.battlecry.potency, target.board[target.index]);
+				if (target.hasOwnProperty('HP')) {
+					if (target.HP <= 0) {
+						// end game now
+					}
+				}
+				else {
+					if (target.board[target.index] <= 0) {
+						target.board.splice(target.index, 1);
+					}
+				}
+			}
 		} else if (battlecry.type == 'draw') {
 			gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
 		}
 	}
 }
 
-function dmgTarget(potency, target, playerData) {
-	let creature = playerData.board[target];
-	creature.cHP -= potency;
-	if (creature.cHP <= 0) {
-		playerData.board.splice(target,1);
-		playerData.graveward.push(creature);
+function findTarget(gameData, uid) {
+	if (uid == 0)
+		return gameData[gameData.playing];
+	if (uid == -1)
+		return gameData[((gameData.playing == 'player1') ? 'player2' : 'player1')];
+	let indexDef = gameData.player1.board.findIndex(x => x.uid == uid);
+	if (indexDef != -1) {
+		return {
+			board: gameData.player1.board,
+			index: indexDef
+		}
+	}
+	indexDef = gameData.player2.board.findIndex(x => x.uid == uid);
+	if (indexDef != -1) {
+		return {
+			board: gameData.player2.board,
+			index: indexDef
+		}
+	}
+	return indexDef;
+}
+
+function dmgTarget(potency, target) {
+	if (target.hasOwnProperty('tag')) {
+		target.HP -= potency;
+	}
+	else {
+		target.cHP -= potency;
 	}
 }
 
 function healTarget(potency, target) {
-
+	if (target.hasOwnProperty('tag')) {
+		target.HP += (target.HP + potency > 30) ? 30 : potency;
+	}
+	else {
+		target.cHP += (target.cHP + potency > target.specs.HP) ? target.specs.HP : potency;
+	}
 }
 
 
