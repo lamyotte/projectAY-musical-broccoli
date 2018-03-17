@@ -1,6 +1,6 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-var connection = new WebSocket('ws://192.168.137.1:3000', 'echo-protocol');
+var connection = new WebSocket('ws:/127.0.0.1:3000', 'echo-protocol');
 
 
 var currentPlayer;
@@ -131,6 +131,17 @@ function sendCommand() {
                     playerId: currentPlayer.id,
                     defender: defender,
                     attacker: attacker
+                }
+            })
+            break;
+        case 'hero-power': 
+            sendMessage({
+                target: 'game-manager',
+                message: {
+                    command: partials[0],
+                    gameId: game.gameId,
+                    playerId: currentPlayer.id,
+                    defender:  partials[1]
                 }
             })
             break;

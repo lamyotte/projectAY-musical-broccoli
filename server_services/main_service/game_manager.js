@@ -41,7 +41,8 @@ function initGame(player1, player2) {
               deckid: 1,
               board: [],
               weapon: {},
-              HP: 30
+              HP: 30,
+              powerActions: 1
           },
           player2: {
               id: player2.id,
@@ -55,7 +56,8 @@ function initGame(player1, player2) {
               deckid: 2,
               board: [],
               weapon: {},
-              HP: 30
+              HP: 30,
+              powerActions: 1
           },
           playing: pickRandom(['player1', 'player2']),
           status: GameStatus.swaping
@@ -170,7 +172,7 @@ function endTurn(message, gameData, sendMessage) {
 	sendMessage(connections[gameData[notPlaying].id], 'start-turn-adversary', {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
-		hand: gameData[gameData.playing].hand.length,
+		hand: gameData[gameData.playing].hand.length-1gth,
 		deck: gameData[gameData.playing].deck.length
 	});
 }
@@ -319,6 +321,41 @@ function healTarget(potency, target) {
 	}
 }
 
+function useHeroPower(message, gameData, sendMessage) {
+	// get job 
+	// verify params
+	// execute action
+	console.log(gameData.player1.job);
+	switch (gameData[gameData.playing].job.specs.type) {
+		case 'dmg':
+			// black mage
+			// dragoon
+			break;
+		case 'heal':
+			// white mage
+			break;
+		case 'draw':
+			// astrologian
+			break;
+		case 'summon':
+			// summoner
+			// machinist
+			break;
+		case 'buff':
+			// scholar
+			// bard
+			// monk
+			// ninja
+			// paladin
+			break;
+		case 'weapon':
+			break;
+		case 'combined':
+			// dark knight
+			break;
+	}
+	
+}
 
 function isCardValid(index, gameData, player, sendMessage) {
 	console.log("IS CARD VALID?")
@@ -514,16 +551,19 @@ function route (connection, message) {
 	.then((gameData) => {
 		switch (message.command) {
 			case 'end-turn':
-				endTurn(message,gameData, sendMessage);
+				endTurn(message, gameData, sendMessage);
 				break;
 			case 'swap-cards':
-				swapCards(message,gameData, sendMessage);
+				swapCards(message, gameData, sendMessage);
 				break;
 			case 'play-card':
-				playCard(message,gameData, sendMessage);
+				playCard(message, gameData, sendMessage);
 				break;
 			case 'attack':
-				attack(message,gameData, sendMessage);
+				attack(message, gameData, sendMessage);
+				break;
+			case 'hero-power':
+				useHeroPower(message, gameData, sendMessage);
 				break;
 		}
 		saveGameData(gameData, message.gameId);
