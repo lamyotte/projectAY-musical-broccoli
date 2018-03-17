@@ -23,10 +23,7 @@ window.onload = function() {
     });
 };
 
-function sendCommand() {
-    let command = document.getElementById('command').value
-    document.getElementById('command').value = '';
-    document.getElementById('command').focus();
+function sendCommand(command) {
     command = command.trim();
     writeToConsole(command);
     let partials = command.split(" ");
@@ -136,7 +133,6 @@ function sendCommand() {
             break;
     }
 }
-
 
 function sendMessage(message) {
     connection.send(JSON.stringify(message));

@@ -196,7 +196,7 @@ function playCard(message, gameData, sendMessage) {
 
 	switch (card.type) {
 		case 'creature' : 
-			playCreatureCard(gameData, index, message.index, player);
+			playCreatureCard(gameData, index, message.index, player, message);
 			break;
 		case 'weapon' :
 			playWeapon(gameData, card, player);
@@ -232,7 +232,7 @@ function playSpellCard(gameData, message) {
 	console.log('playing spell card');
 }
  
-function playCreatureCard(gameData, card, index, player) {
+function playCreatureCard(gameData, card, index, player, message) {
 	let adversary = (gameData.playing == 'player1') ? 'player2' : 'player1';
 	gameData[player].board.splice(index, 0, gameData[player].hand[card]);
 	gameData[player].board[index].cHP = gameData[player].board[index].specs.HP;
@@ -241,24 +241,24 @@ function playCreatureCard(gameData, card, index, player) {
 
 	// check sides bonus
 	// check board wide bonus
-	console.log(gameData[player].board);
-	console.log(index);
 	if (gameData[player].board[index].specs.abilities.hasOwnProperty('battlecry')) {
 		let battlecry = gameData[player].board[index].specs.abilities.battlecry;
 		if (battlecry.type == 'charge') {
 			gameData[player].board[index].actions += 1;;
 		} else if (battlecry.type == 'heal') {
-			let target = findTarget(gameData, message.uid);
+			let target = findTarget(gameData, message.defender);
 			if (target == -1) {
-				/// invalid targe stop !
+				/// invalid target stop !
+				console.log("DIDNT FIND IT!");
 			}
 			else {
 				healTarget(card.specs.abilities.battlecry.potency, target);	
 			}
 		} else if (battlecry.type == 'dmg') {
-			let target = findTarget(gameData, message.uid);
+			let target = findTarget(gameData, message.defender);
 			if (target == -1) {
 				// invalid
+				console.log("DIDNT FIND IT!");
 			}
 			else {
 				dmgTarget(card.specs.abilities.battlecry.potency, target.board[target.index]);
