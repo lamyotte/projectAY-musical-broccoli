@@ -246,8 +246,9 @@ function playCreatureCard(gameData, card, index, player, message) {
 		let battlecry = gameData[player].board[index].specs.abilities.battlecry;
 		if (battlecry.type == 'charge') {
 			gameData[player].board[index].actions += 1;;
-		} else if (battlecry.type == 'heal') {
-			let target = findTarget(gameData, message.defender);
+		} 
+		else if (battlecry.type == 'heal') {
+			let target = findTarget(gameData, (battlecry.hasOwnProperty('target')) ? battlecry.target : message.defender);
 			if (target == -1) {
 				/// invalid target stop !
 				console.log("DIDNT FIND IT!");
@@ -256,8 +257,9 @@ function playCreatureCard(gameData, card, index, player, message) {
 			else {
 				healTarget(gameData[player].hand[card].specs.abilities.battlecry.potency, target);	
 			}
-		} else if (battlecry.type == 'dmg') {
-			let target = findTarget(gameData, message.defender);
+		} 
+		else if (battlecry.type == 'dmg') {
+			let target = findTarget(gameData, (battlecry.hasOwnProperty('target')) ? battlecry.target : message.defender);
 			if (target == -1) {
 				// invalid
 				return;
@@ -266,7 +268,8 @@ function playCreatureCard(gameData, card, index, player, message) {
 				dmgTarget(gameData[player].hand[card].specs.abilities.battlecry.potency, target);
 				clearDead(target);
 			}
-		} else if (battlecry.type == 'draw') {
+		} 
+		else if (battlecry.type == 'draw') {
 			gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
 		}
 	}
