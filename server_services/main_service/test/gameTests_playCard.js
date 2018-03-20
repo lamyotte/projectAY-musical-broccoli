@@ -26,7 +26,7 @@ describe('Play Card Tests', () => {
         card: 11,
         index: 0
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board is not empty anymore
       assert.isTrue(gameData.player1.board.length == 1);
       // Check that the card was placed
@@ -68,7 +68,7 @@ describe('Play Card Tests', () => {
         card: 22,
         index: 0
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board has 2 cards
       assert.isTrue(gameData.player1.board.length == 2);
       // Check that the card was placed
@@ -109,7 +109,7 @@ describe('Play Card Tests', () => {
             "Atk" : 1,
             "abilities" :{
               "battlecry" : {
-                    "type" : "heal",
+                    "type" : "dmg",
                     "potency" : "2"
                 }
             }
@@ -117,13 +117,13 @@ describe('Play Card Tests', () => {
       });
       let message = {
         playerId: 1,
-        card: 22,
+        card: 12,
         index: 0,
-        target: 11
+        defender: 11
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board has 2 cards
-      assert.isTrue(gameData.player1.board.length == 2);
+      assert.isTrue(gameData.player1.board.length == 1);
       // Check that the card was placed
       assert.equal(gameData.player1.board[0].uid, 12);
       // Check that the card has no actions
@@ -170,13 +170,13 @@ describe('Play Card Tests', () => {
       });
       let message = {
         playerId: 1,
-        card: 22,
+        card: 12,
         index: 0,
-        target: 11
+        defender: 11
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board has 2 cards
-      assert.isTrue(gameData.player1.board.length == 2);
+      assert.isTrue(gameData.player1.board.length == 1);
       // Check that the card was placed
       assert.equal(gameData.player1.board[0].uid, 12);
       // Check that the card has no actions
@@ -188,7 +188,7 @@ describe('Play Card Tests', () => {
       // Check that the target card is still there
       assert.isTrue(gameData.player2.board.length == 1);
       // Check that the target card is missing hp
-      assert.isTrue(gameData.player2.board[0].HP == 1);
+      assert.isTrue(gameData.player2.board[0].cHP == 1);
     });
     it('play creature with heal battlecry', () => {
       gameData.player1.board.push({
@@ -225,11 +225,11 @@ describe('Play Card Tests', () => {
       });
       let message = {
         playerId: 1,
-        card: 22,
+        card: 12,
         index: 0,
-        target: 11
+        defender: 11
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board has 2 cards
       assert.isTrue(gameData.player1.board.length == 2);
       // Check that the card was placed
@@ -277,11 +277,11 @@ describe('Play Card Tests', () => {
       });
       let message = {
         playerId: 1,
-        card: 22,
+        card: 12,
         index: 0,
-        target: 11
+        defender: 11
       };
-      playCard(message, gameData, (message) => {console.log(message)});
+      playCard(message, gameData, (message) => {});
       // Check that the board has 2 cards
       assert.isTrue(gameData.player1.board.length == 2);
       // Check that the card was placed

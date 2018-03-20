@@ -3,7 +3,6 @@ var attack = require('../game_manager.js').attack;
 var defaultGameData = require('./data/gameDataDefault').gameData;
 
 describe('Attack tests', () => {
-
   describe('Attacking', () => {
   	let gameData;
 	beforeEach(() => {
@@ -47,7 +46,7 @@ describe('Attack tests', () => {
         defender: 12,
         attacker: 13
     	};
-    	attack(message, gameData, (message) => {console.log(message)});
+    	attack(message, gameData, (message) => {});
     	assert.isTrue(gameData.player2.board.length == 0);
     	assert.isTrue(gameData.player1.board.length == 1);
     	assert.isTrue(gameData.player1.board[0].cHP == 998);
@@ -64,7 +63,7 @@ describe('Attack tests', () => {
 	        defender: 12,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 0);
       	assert.isTrue(gameData.player2.board[0].cHP == 998);
@@ -79,7 +78,7 @@ describe('Attack tests', () => {
 	        defender: 12,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player2.board[0].cHP == 1);
@@ -93,7 +92,7 @@ describe('Attack tests', () => {
 	        defender: -1,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player2.HP == 29);
@@ -106,7 +105,7 @@ describe('Attack tests', () => {
 	        defender: -1,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player1.board[0].actions == 0);
@@ -137,7 +136,7 @@ describe('Attack tests', () => {
 	        defender: 12,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 2);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player1.board[0].actions == 1);
@@ -164,7 +163,7 @@ describe('Attack tests', () => {
 	        defender: -1,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 2);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player1.board[0].actions == 1);
@@ -208,7 +207,7 @@ describe('Attack tests', () => {
 	        defender: 14,
 	        attacker: 13
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
       	assert.isTrue(gameData.player2.board.length == 3);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player1.board[0].actions == 0);
@@ -226,8 +225,8 @@ describe('Attack tests', () => {
 	        defender: 12,
 	        attacker: 13
       	};
-		attack(message, gameData, (message) => {console.log(message)});
-		attack(message, gameData, (message) => {console.log(message)});
+		attack(message, gameData, (message) => {});
+		attack(message, gameData, (message) => {});
 		assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player2.board[0].cHP == 1);
@@ -256,7 +255,7 @@ describe('Attack tests', () => {
 	        defender: 14,
 	        attacker: 13
       	};
-		attack(message, gameData, (message) => {console.log(message)});
+		attack(message, gameData, (message) => {});
 		assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 2);
       	assert.isTrue(gameData.player1.board[1].cHP == 2);
@@ -273,7 +272,7 @@ describe('Attack tests', () => {
 	        defender: 13,
 	        attacker: 12
       	};
-      	attack(message, gameData, (message) => {console.log(message)});
+      	attack(message, gameData, (message) => {});
 		assert.isTrue(gameData.player2.board.length == 1);
       	assert.isTrue(gameData.player1.board.length == 1);
       	assert.isTrue(gameData.player2.board[0].cHP == 2);
