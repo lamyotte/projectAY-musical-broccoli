@@ -1,6 +1,6 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-var connection = new WebSocket('ws:/127.0.0.1:3000', 'echo-protocol');
+var connection = new WebSocket('ws:/192.168.137.1:3000', 'echo-protocol');
 
 
 var currentPlayer;
@@ -221,11 +221,13 @@ connection.onmessage = function(message) {
                     game.localBoard = json.message.local;
                     game.hand = json.message.hand;
                     game.mana = json.message.mana;
+                    game.HP = json.message.HP;
                 }
                 else {
                     game.adversaryBoard = json.message.adversary;
                     game.adversaryMana = json.message.mana;
                     game.adversaryHand = json.message.hand;
+                    game.adversaryHP = json.message.HP;
                 }
                 game.drawGame(writeToConsole);
             }
@@ -237,6 +239,10 @@ connection.onmessage = function(message) {
             else if(json.command == 'update-hp') {
                 game.HP = json.message.local;
                 game.adversaryHP = json.message.adversary;
+            }
+            else if(json.command == 'update-mana') {
+                game.mana = json.message.local;
+                game.adversaryMana = json.message.adversary;
             }
         } 
         // handle incoming message
