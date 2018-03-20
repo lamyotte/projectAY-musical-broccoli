@@ -244,6 +244,9 @@ connection.onmessage = function(message) {
                 game.mana = json.message.local;
                 game.adversaryMana = json.message.adversary;
             }
+            else if(json.command == 'end-game') {
+                writeToConsole("GAME OVER! Winner : " + json.message.winner, colors.blue);
+            }
         } 
         // handle incoming message
     } catch (e) {
