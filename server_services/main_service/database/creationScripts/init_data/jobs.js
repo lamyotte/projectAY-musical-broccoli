@@ -5,7 +5,7 @@ const jobs = [
 		specs: {
 			type : "dmg",
             potency : "2",
-            target: "face"
+            target: "-1"
 		}
 	},
 	{

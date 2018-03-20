@@ -47,7 +47,7 @@ function initGame(player1, player2) {
           player2: {
               id: player2.id,
               tag: data[1].gamerTag,
-              job: data[2].job,
+              job: data[3].job,
               hand: drawCards(data[3].cards,startingCards),
               manapool: 0,
               mana: 0,
@@ -172,13 +172,12 @@ function endTurn(message, gameData, sendMessage) {
 	sendMessage(connections[gameData[notPlaying].id], 'start-turn-adversary', {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
-		hand: gameData[gameData.playing].hand.length-1gth,
+		hand: gameData[gameData.playing].hand.length,
 		deck: gameData[gameData.playing].deck.length
 	});
 }
 
 function playCard(message, gameData, sendMessage) {
-	console.log("PLAYING CARD")
 	let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
 	let adversary = (gameData.player1.id == message.playerId) ? 'player2' : 'player1';
 	let index;
@@ -190,7 +189,6 @@ function playCard(message, gameData, sendMessage) {
 	}
 
 	index = gameData[player].hand.findIndex(x => x.uid == message.card);
-	console.log(index);
 	card = gameData[player].hand[index];
 
 	if (!isCardValid(index, gameData, player, sendMessage))
@@ -207,19 +205,20 @@ function playCard(message, gameData, sendMessage) {
 			playSpellCard(gameData, message, player);
 			breakl
 	}
-	console.log("here");
 	gameData[player].mana -= card.specs.cost;
 	gameData[player].hand.splice(index,1);
 
 	sendMessage(connections[gameData[player].id], 'update-game', {
 		local: gameData[player].board,
 		hand: gameData[player].hand,
-		mana: gameData[player].mana
+		mana: gameData[player].mana,
+		HP: gameData[player].HP
 	});
 	sendMessage(connections[gameData[adversary].id], 'update-game', {
 		adversary: gameData[player].board,
 		mana: gameData[player].mana,
-		hand: gameData[player].hand.length
+		hand: gameData[player].hand.length,
+		HP: gameData[player].HP
 	});
 
 }
@@ -252,28 +251,20 @@ function playCreatureCard(gameData, card, index, player, message) {
 			if (target == -1) {
 				/// invalid target stop !
 				console.log("DIDNT FIND IT!");
+				return;
 			}
 			else {
-				healTarget(card.specs.abilities.battlecry.potency, target);	
+				healTarget(gameData[player].hand[card].specs.abilities.battlecry.potency, target);	
 			}
 		} else if (battlecry.type == 'dmg') {
 			let target = findTarget(gameData, message.defender);
 			if (target == -1) {
 				// invalid
-				console.log("DIDNT FIND IT!");
+				return;
 			}
 			else {
-				dmgTarget(card.specs.abilities.battlecry.potency, target.board[target.index]);
-				if (target.hasOwnProperty('HP')) {
-					if (target.HP <= 0) {
-						// end game now
-					}
-				}
-				else {
-					if (target.board[target.index] <= 0) {
-						target.board.splice(target.index, 1);
-					}
-				}
+				dmgTarget(gameData[player].hand[card].specs.abilities.battlecry.potency, target);
+				clearDead(target);
 			}
 		} else if (battlecry.type == 'draw') {
 			gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
@@ -304,36 +295,104 @@ function findTarget(gameData, uid) {
 }
 
 function dmgTarget(potency, target) {
-	if (target.hasOwnProperty('tag')) {
+	if (!target.hasOwnProperty('index')) {
 		target.HP -= potency;
 	}
 	else {
-		target.cHP -= potency;
+		target.board[target.index].cHP -= potency;
 	}
 }
 
 function healTarget(potency, target) {
 	if (target.hasOwnProperty('tag')) {
-		target.HP += (target.HP + potency > 30) ? 30 : potency;
+		target.HP = (target.HP + potency >=	 30) ? 30 : target.HP + potency;
 	}
 	else {
-		target.cHP += (target.cHP + potency > target.specs.HP) ? target.specs.HP : potency;
+		target.board[target.index].cHP = (target.board[target.index].cHP + potency >= target.board[target.index].specs.HP) ? 
+														target.board[target.index].specs.HP : 
+														target.board[target.index].cHP + potency;
 	}
+}
+
+function clearDead(target) {
+	if (!target.hasOwnProperty('index')) {
+		if (target.HP <= 0) {
+
+		}
+	}
+	else {
+		if (target.board[target.index].cHP <= 0) {
+			target.board.splice(target.index, 1);
+		}
+	}
+}
+
+function endGame(sendMessage) {
+	sendMessage(connections[gameData.player1.id], 'end-game', {
+		winner: (gameData.player1.HP == 0) ? gameData.player2.tag : gameData.player1.tag
+	});
+	sendMessage(connections[gameData.player2.id], 'end-game', {
+		winner: (gameData.player1.HP == 0) ? gameData.player2.tag : gameData.player1.tag
+	});
 }
 
 function useHeroPower(message, gameData, sendMessage) {
 	// get job 
 	// verify params
 	// execute action
-	console.log(gameData.player1.job);
+	if (gameData[gameData.playing].powerActions == 0) {
+		console.log("no more actions");
+		return;
+	}
+	if (gameData[gameData.playing].mana - 2 < 0) {
+		console.log("no more mana");
+		return;
+	}
+	console.log(gameData[gameData.playing].job);
 	switch (gameData[gameData.playing].job.specs.type) {
-		case 'dmg':
+		case 'dmg': {
 			// black mage
 			// dragoon
+			let target;
+			// Check if there is a limited target
+			if (gameData[gameData.playing].job.specs.hasOwnProperty('target')) {
+				target = findTarget(gameData, gameData[gameData.playing].job.specs.target);
+				console.log(gameData[gameData.playing].job);
+				if (target == -1) {
+					console.log('target not found');
+					return;
+				}
+			}
+			else {
+				target = findTarget(gameData, message.defender);
+				if (target == -1) {
+					console.log('target not found');
+					return;
+				}
+			}
+			dmgTarget(gameData[gameData.playing].job.specs.potency, target);
+			console.log(target);
+			clearDead(target);
 			break;
-		case 'heal':
+		}
+		case 'heal': {
 			// white mage
+			let target;
+			// Check if there is a limited target
+			if (gameData[gameData.playing].job.specs.hasOwnProperty('target')) {
+				target = findTarget(gameData, gameData[gameData.playing].job.specs.target);
+			}
+			else {
+				target = findTarget(gameData, message.defender);
+				if (target == -1) {
+					console.log('target not found');
+					return;
+				}
+			}
+			healTarget(gameData[gameData.playing].job.specs.potency, target);
+			clearDead(target);
 			break;
+		}
 		case 'draw':
 			// astrologian
 			break;
@@ -354,19 +413,40 @@ function useHeroPower(message, gameData, sendMessage) {
 			// dark knight
 			break;
 	}
+	gameData[gameData.playing].powerActions -= 1;
+	gameData[gameData.playing].mana -= 2;
+	sendMessage(connections[gameData.player1.id], 'update-hp', {
+		local: gameData.player1.HP,
+		adversary: gameData.player2.HP
+	});
+	sendMessage(connections[gameData.player2.id], 'update-hp', {
+		local: gameData.player2.HP,
+		adversary: gameData.player1.HP
+	});
+	sendMessage(connections[gameData.player1.id], 'update-mana', {
+		local: gameData.player1.mana,
+		adversary: gameData.player2.mana
+	});
+	sendMessage(connections[gameData.player2.id], 'update-mana', {
+		local: gameData.player2.mana,
+		adversary: gameData.player1.mana
+	});
+	sendMessage(connections[gameData.player1.id], 'update-board', {
+		local: gameData.player1.board,
+		adversary: gameData.player2.board 
+	});
+	sendMessage(connections[gameData.player2.id], 'update-board', {
+		local: gameData.player2.board,
+		adversary: gameData.player1.board
+	});
 	
 }
 
 function isCardValid(index, gameData, player, sendMessage) {
-	console.log("IS CARD VALID?")
 	if (index == -1) {
 		sendMessage(connections[gameData[player].id], 'error', 'Card not in hand');
 		return false;
 	}
-	console.log("ttttttttttttt")
-	console.log(gameData[player].mana);
-	console.log(gameData[player].hand[index].spcost);
-	console.log("ttttttttttttt")
 	if (gameData[player].mana - gameData[player].hand[index].specs.cost < 0) {
 		sendMessage(connections[gameData[player].id], 'error', 'Not enough mana');
 		return false;
@@ -434,7 +514,6 @@ function attack(message, gameData, sendMessage) {
 }
 
 function attackCreature(gameData, cardsData, player, adversary) {
-	console.log("ATTACKING CREATURE");
 	let attacker = cardsData.card;
 	let defender = gameData[adversary].board[cardsData.indexDef];
 	attacker.cHP -= defender.cAtk;
@@ -576,5 +655,6 @@ module.exports = {
 	swapCards,
 	playCard,
 	attack,
-	endTurn
+	endTurn,
+	useHeroPower
 }
