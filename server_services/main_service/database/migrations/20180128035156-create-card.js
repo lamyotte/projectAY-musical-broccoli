@@ -11,8 +11,24 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.STRING
+      },
+      lore: {
+        type: Sequelize.STRING
+      },
       img: {
         type: Sequelize.STRING
+      },
+      type: {
+        type: Sequelize.STRING
+      },
+      JobId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Jobs',
+          key: 'id'
+        }
       },
       specs: {
         type: Sequelize.JSONB

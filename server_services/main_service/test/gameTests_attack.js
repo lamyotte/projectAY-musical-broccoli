@@ -13,6 +13,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 1,
           "cAtk" : 2,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,
@@ -26,8 +27,9 @@ describe('Attack tests', () => {
 	      "name" : "TestCard",
 	      "type" : "creature",
 	      "cHP" : 1,
-          "cAtk" : 1,
-          "actions": 1,
+        "cAtk" : 1,
+        "actions": 1,
+        "status" : [],
 	      "specs" : {
 	        "cost" : 1,
 	        "HP" : 1,
@@ -123,6 +125,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 1,
           "cAtk" : 2,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,
@@ -150,6 +153,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 1,
           "cAtk" : 2,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,
@@ -180,6 +184,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 2,
           "cAtk" : 1,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,
@@ -194,6 +199,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 2,
           "cAtk" : 1,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,
@@ -242,6 +248,7 @@ describe('Attack tests', () => {
           "type" : "creature",
           "cHP" : 2,
           "cAtk" : 1,
+          "status" : [],
           "specs" : {
             "cost" : 1,
             "HP" : 1,

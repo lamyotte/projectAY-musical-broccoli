@@ -311,6 +311,7 @@ describe('Play Card Tests', () => {
         card: 11,
         index: 0
       };
+      playCard(message, gameData, () => {});
       // Creature was not placed on board
       assert.isTrue(gameData.player1.board.length == 0);
       // Cost was NOT deduced
@@ -338,17 +339,201 @@ describe('Play Card Tests', () => {
     });
   });
   describe('Play Spell', () => {
-    it('should play healing spell', () => {  
-      assert.equal([1,2,3].indexOf(4), -1);
+    it('should play healing spell to given target', () => { 
+      gameData.player2.HP = 26;
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 1,
+            "effects" : [{
+                "type" : "heal",
+                "potency" : 4
+            }]
+        }
+      }]; 
+      let message = {
+        playerId: 1,
+        card: 25,
+        defender: 'adversary'
+      };
+      playCard(message, gameData, () => {});
+      assert.isTrue(gameData.player1.hand.length == 0);
+      assert.isTrue(gameData.player2.HP == 30);
+      assert.isTrue(gameData.player1.mana == 0);
     });
-    it('should play damage spell', () => {
-      assert.equal([1,2,3].indexOf(4), -1);
+    it('should play damage spell given target', () => {
+      gameData.player2.HP = 30;
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 1,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 4
+            }]
+        }
+      }]; 
+      let message = {
+        playerId: 1,
+        card: 25,
+        defender: 'adversary'
+      };
+      playCard(message, gameData, () => {});
+      assert.isTrue(gameData.player1.hand.length == 0);
+      assert.isTrue(gameData.player2.HP == 26);
+      assert.isTrue(gameData.player1.mana == 0);
+    });
+    it('should play damage spell aoe ', () => {
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 1,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 4,
+                "target" : {
+                  "type" : "aoe",
+                  "target" : 'adversary-board'
+                }
+            }]
+        }
+      }]; 
+      gameData.player2.board.push(...[{
+        'uid' : 1,
+        'cHP' : 5
+      },{
+        'uid' : 2,
+        'cHP' : 6
+      },{
+        'uid' : 3,
+        'cHP' : 4
+      }])
+      let message = {
+        playerId: 1,
+        card: 25,
+      };
+      playCard(message, gameData, () => {});
+      console.log(gameData.player2.board)
+      assert.isTrue(gameData.player1.hand.length == 0);
+      assert.isTrue(gameData.player2.board[0].cHP == 1);
+      assert.isTrue(gameData.player2.board[1].cHP == 2);
+      assert.isTrue(gameData.player2.board.length == 2);
+      assert.isTrue(gameData.player1.mana == 0);
+    });
+    it('should play random spell once ', () => {
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 1,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 1,
+                "target" : {
+                  "type" : "rand",
+                  "target" : "adversary-board"
+                }
+            }]
+        }
+      }]; 
+      gameData.player2.board.push(...[{
+        'uid' : 1,
+        'cHP' : 5
+      },{
+        'uid' : 2,
+        'cHP' : 6
+      }])
+      let message = {
+        playerId: 1,
+        card: 25,
+      };
+      playCard(message, gameData, () => {});
+      assert.isTrue(gameData.player1.hand.length == 0);
+      assert.isTrue(gameData.player2.board[0].cHP == 4 || gameData.player2.board[1].cHP == 5);
+      assert.isTrue(gameData.player2.board.length == 2);
+      assert.isTrue(gameData.player1.mana == 0);
+    });
+    it('should play random spell twice ', () => {
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 1,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 1,
+                "target" : {
+                  "type" : "rand",
+                  "target" : "adversary-board"
+                },
+                "repetition" : 2
+            }]
+        }
+      }]; 
+      gameData.player2.board.push(...[{
+        'uid' : 1,
+        'cHP' : 5
+      },{
+        'uid' : 2,
+        'cHP' : 6
+      }])
+      let message = {
+        playerId: 1,
+        card: 25,
+      };
+      playCard(message, gameData, () => {});
+      assert.isTrue(gameData.player1.hand.length == 0);
+      assert.isTrue((gameData.player2.board[0].cHP == 4 && gameData.player2.board[1].cHP == 5) || 
+                    (gameData.player2.board[0].cHP == 3 && gameData.player2.board[1].cHP == 6) ||
+                    (gameData.player2.board[0].cHP == 5 && gameData.player2.board[1].cHP == 4));
+      assert.isTrue(gameData.player2.board.length == 2);
+      assert.isTrue(gameData.player1.mana == 0);
     });
     it('should play bonus spell', () => {
-      assert.equal([1,2,3].indexOf(4), -1);
+      assert.equal([1,2,3].indexOf(4), 0);
     });
     it('should fail when not enough mana', () => {
-      assert.equal([1,2,3].indexOf(4), -1);
+      gameData.player1.mana = 1;
+      gameData.player1.hand =[{
+        "uid": 25,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 2,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 4,
+                "target" : {
+                  "type" : "aoe",
+                  "target" : 'adversary-board'
+                }
+            }]
+        }
+      }]; 
+      gameData.player2.board.push(...[{
+        'uid' : 1,
+        'cHP' : 5
+      },{
+        'uid' : 2,
+        'cHP' : 6
+      }])
+      let message = {
+        playerId: 1,
+        card: 25,
+      };
+      playCard(message, gameData, () => {});
+      assert.isTrue(gameData.player1.hand.length == 1);
+      assert.isTrue(gameData.player2.board[0].cHP == 5);
+      assert.isTrue(gameData.player2.board[1].cHP == 6);
+      assert.isTrue(gameData.player2.board.length == 2);
+      assert.isTrue(gameData.player1.mana == 1);
     });
   });
 });

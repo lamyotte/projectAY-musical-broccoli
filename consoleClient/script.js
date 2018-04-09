@@ -1,6 +1,6 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-var connection = new WebSocket('ws:/192.168.137.1:3000', 'echo-protocol');
+var connection = new WebSocket('ws:/localhost:3000', 'echo-protocol');
 
 
 var currentPlayer;
@@ -217,18 +217,14 @@ connection.onmessage = function(message) {
                 writeToConsole("Waiting on adversary...", colors.data);
             }
             else if(json.command == 'update-game') {
-                if (json.message.hasOwnProperty('local')) {
-                    game.localBoard = json.message.local;
-                    game.hand = json.message.hand;
-                    game.mana = json.message.mana;
-                    game.HP = json.message.HP;
-                }
-                else {
-                    game.adversaryBoard = json.message.adversary;
-                    game.adversaryMana = json.message.mana;
-                    game.adversaryHand = json.message.hand;
-                    game.adversaryHP = json.message.HP;
-                }
+                game.localBoard = json.message.localBoard;
+                game.hand = json.message.localHand;
+                game.mana = json.message.localMana;
+                game.HP = json.message.localHP;
+                game.adversaryHP = json.message.adversaryHP;
+                game.adversaryMana = json.message.adversaryMana;
+                game.adversaryBoard = json.message.adversaryBoard;
+                game.adversaryHand = json.message.adversaryHand;
                 game.drawGame(writeToConsole);
             }
             else if(json.command == 'update-board') {

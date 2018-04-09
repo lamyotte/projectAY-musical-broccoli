@@ -13,9 +13,7 @@ function formatDeck(data) {
   delete deck.job.createdAt;
   delete deck.job.updatedAt;
   for(let i = 0; i < data.length; i++) {
-    deck.cards[i] = data[i].Card.dataValues;
-    deck.cards[i].type = deck.cards[i].specs.type;
-    delete deck.cards[i].specs.type; 
+    deck.cards[i] = data[i].Card.dataValues; 
     deck.cards[i].uid = data[i].id;
   }
   console.log(deck.cards[0]);

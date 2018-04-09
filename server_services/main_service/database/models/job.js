@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Job.associate = function(models) {
     Job.hasMany(models.Deck);
+    Job.hasMany(models.Card);
   }
   return Job;
 };

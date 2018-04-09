@@ -3,6 +3,8 @@ const Job = require('../models').Job;
 const jobs = require('./init_data/jobs.js').jobs;
 
 const cards = require('./init_data/cards.js').cards;
+const cards_blm = require('./init_data/cards_blm.js').cards;
+const cards_drg = require('./init_data/cards_drg.js').cards;
 const Card = require('../models').Card;
 
 const players = require('./init_data/players.js').players;
@@ -20,11 +22,11 @@ function formatMany(object) {
 
 function createCards() {
 	return Card.bulkCreate(cards)
-		.then((res) => {
-			return Card.all();
+		.then((card) =>{
+			Card.bulkCreate(cards_blm)
 		})
-		.then((res) => {
-			console.log(formatMany(res));
+		.then((card) =>{
+			Card.bulkCreate(cards_drg)
 		})
 }
 
@@ -32,10 +34,6 @@ function createJobs() {
 	return Job.bulkCreate(jobs)
 		.then((res) => {
 			console.log('ok');
-			return Job.all();
-		})
-		.then((res) => {
-			console.log(formatMany(res));
 		})
 }
 
@@ -58,34 +56,61 @@ function createDecks() {
 		PlayerId: 2,
 		JobId: 2,
 	}])
-	.then(() => {
-		return Deck.all();
-	})
 	.then((deck) => {
-		return Promise.all([deck[0].addCards([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]), 
-							deck[1].addCards([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15])])
+		console.log(deck);
+		//deck[0].addCard([1,2,3,4,5,6,7,8,9,10,11,12,13,14,1,2,3,4,5,6,7,8,9,10,11,12,13,14]);
+		//deck[1].addCard([1,2,3,4,5,6,7,8,9,10,11,12,13,14,1,2,3,4,5,6,7,8,9,10,11,12,13,14]);
+	})
+}
+
+function addCardsToDeck(){
+	return Deck.all()
+	.then((decks) => {
+		decks[1].addCard([21,22,23,24,26,20,25,4,6,16,17,18,19,10,14]);
+		decks[1].addCard([21,22,23,24,26,20,25,4,6,16,17,18,19,10,14]);
+		decks[0].addCard([27,28,29,30,42,34,35,36,37,38,2,4,39,40,11]);
+		decks[0].addCard([27,28,29,30,42,34,35,36,37,38,2,4,39,40,11]);
+	})
+}
+
+function all() {
+	createJobs()
+	.then(() =>{
+		return createCards();
 	})
 	.then(() => {
-		return Deck.findAll({
-			include: { model: Card, required: true}
-		});
+		return createPlayers();
 	})
-	.then((res) => {
-		console.log(formatMany(res));
+	.then(() => {
+		return createDecks();
+	})
+	.then(() => {
+		return addCardsToDeck();
 	})
 }
 
 function main() {
 	return Promise.all([
-		createCards(),
 		createJobs(),
 		createPlayers()
 	]).then(() => {
-		return createDecks();
+		return createCards();// createDecks();
 	})	
 	.catch((err) => {
 		console.log(err);
 	})
 }
 
-main().then(process.exit);;
+//main().then(process.exit);;
+
+
+module.exports = {
+	createCards,
+	createJobs,
+	createPlayers,
+	createDecks,
+	addCardsToDeck,
+	all
+};
+
+require('make-runnable');

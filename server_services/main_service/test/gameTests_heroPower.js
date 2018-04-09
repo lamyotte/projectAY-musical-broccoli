@@ -14,6 +14,7 @@ describe('Hero power tests', () => {
 			}
 		}
 		gameData.player1.powerActions = 1;
+		gameData.player1.mana = 2;
 	});
     it('should damage targetted friendly creature', () => {
     	gameData.player1.board.push({
@@ -25,8 +26,8 @@ describe('Hero power tests', () => {
     		defender: 1
     	}
     	useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player1.board[0].cHP == 1);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player1.board[0].cHP, 1);
+    	assert.equal(gameData.player1.powerActions, 0);
     });
 	it('should damage targetted ennemy creature', () => {
 		gameData.player2.board.push({
@@ -38,8 +39,8 @@ describe('Hero power tests', () => {
 			defender: 2
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.board[0].cHP == 1);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.board[0].cHP, 1);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should kill targetted ennemy creature', () => {
 		gameData.player2.board.push({
@@ -51,41 +52,41 @@ describe('Hero power tests', () => {
 			defender: 2
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.board.length == 0);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.board.length, 0);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should damage self', () => {
 		gameData.player1.HP = 30;
 		let message = { 
 			playerId: 1,
-			defender: 0
+			defender: 'local'
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player1.HP == 28);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player1.HP, 28);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should damage oponent', () => {
 		gameData.player2.HP = 30;
 		let message = { 
 			playerId: 1,
-			defender: -1
+			defender: 'adversary'
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 28);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 28);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should fail to use twice', () => {
 		gameData.player2.HP = 30;
 		let message = { 
 			playerId: 1,
-			defender: -1
+			defender: 'adversary'
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 28);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 28);
+    	assert.equal(gameData.player1.powerActions, 0);
     	useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 28);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 28);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
   });
   describe('Dragoon', () => {
@@ -96,10 +97,11 @@ describe('Hero power tests', () => {
 			specs: {
 				type: 'dmg',
 				potency: 2,
-				target: -1
+				target: "adversary"
 			}
 		}
 		gameData.player1.powerActions = 1;
+		gameData.player1.mana = 2;
 	});
     it('should damage oponent', () => {
     	gameData.player2.HP = 30;
@@ -107,8 +109,8 @@ describe('Hero power tests', () => {
 			playerId: 1
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 28);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 28);
+    	assert.equal(gameData.player1.powerActions, 0);
     });
     it('should ignore damage to creature and damage face instead', () => {
     	gameData.player2.HP = 30;
@@ -121,9 +123,9 @@ describe('Hero power tests', () => {
 			defender: 2
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 28);
-    	assert.isTrue(gameData.player2.board[0].cHP == 3);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 28);
+    	assert.equal(gameData.player2.board[0].cHP, 3);
+    	assert.equal(gameData.player1.powerActions, 0);
     });
   });
   describe('White mage', () => {
@@ -137,6 +139,7 @@ describe('Hero power tests', () => {
 			}
 		}
 		gameData.player1.powerActions = 1;
+		gameData.player1.mana = 2;
 	});
     it('should heal targetted friendly creature', () => {
     	gameData.player1.board.push({
@@ -151,8 +154,8 @@ describe('Hero power tests', () => {
     		defender: 1
     	}
     	useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player1.board[0].cHP == 3);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player1.board[0].cHP, 3);
+    	assert.equal(gameData.player1.powerActions, 0);
     });
 	it('should heal targetted ennemy creature', () => {
 		gameData.player2.board.push({
@@ -167,28 +170,28 @@ describe('Hero power tests', () => {
 			defender: 2
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.board[0].cHP == 2);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.board[0].cHP, 2);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should heal self', () => {
 		gameData.player1.HP = 28;
 		let message = { 
 			playerId: 1,
-			defender: 0
+			defender: 'local'
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player1.HP == 30);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player1.HP, 30);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
 	it('should heal oponent', () => {
 		gameData.player2.HP = 24;
 		let message = { 
 			playerId: 1,
-			defender: -1
+			defender: 'adversary'
 		}
 		useHeroPower(message, gameData, (message) => {console.log(message)});
-    	assert.isTrue(gameData.player2.HP == 26);
-    	assert.isTrue(gameData.player1.powerActions == 0);
+    	assert.equal(gameData.player2.HP, 26);
+    	assert.equal(gameData.player1.powerActions, 0);
 	});
   });
 });
