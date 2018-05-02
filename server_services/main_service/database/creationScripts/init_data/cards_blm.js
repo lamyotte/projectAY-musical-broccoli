@@ -38,7 +38,7 @@ const cards = [
         "type" : "spell",
         "specs" : {
             "cost" : 2,
-            "effects" : [ {
+            "effects" : [{
                 "type" : "dmg",
                 "potency" : 3
             }]

@@ -8,7 +8,7 @@ describe('Play Card Tests', () => {
     gameData = JSON.parse(JSON.stringify(defaultGameData));;
   });
   describe('Play Creature', () => {
-    it('play the creature at index 0 on empty board', () => {	
+    it('play the creature at index 0 on empty board', async () => {	
       gameData.player1.hand.push({
           "uid" : 11,
           "name" : "TestCard",
@@ -26,7 +26,7 @@ describe('Play Card Tests', () => {
         card: 11,
         index: 0
       };
-      playCard(message, gameData, (message) => {});
+      await playCard(message, gameData, (message) => {});
       // Check that the board is not empty anymore
       assert.isTrue(gameData.player1.board.length == 1);
       // Check that the card was placed

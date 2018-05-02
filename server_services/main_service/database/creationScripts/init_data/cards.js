@@ -310,7 +310,8 @@ const cards = [
             "abilities" : {
                 "battlecry" : {
                     "type" : "summon",
-                    "summon" : 41
+                    "summon" : 41,
+                    "potency" : 1
                 }
             }
         }

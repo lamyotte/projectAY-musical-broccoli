@@ -24,7 +24,7 @@ var server = http.createServer(function(request, response) {
 });
 
 
-server.listen(3000 ,function() {
+server.listen(3000, function() {
     console.log('Listening to port:  ' + 3000);
 });
 
@@ -59,21 +59,24 @@ wsServer.on('request', function(request) {
     //
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
+        	console.log(message);
         	let request = JSON.parse(message.utf8Data);
-            switch(request.target) {
-                case 'matchmaker':
-                    matchmaker(connection, request.message);
-                    break;
-                case 'authenticator':
-                    authentication_module(connection, request.message);
-                    break;
-                case 'global-manager':
-                    global_manager(connection, request.message);
-                    break;
-                case 'game-manager':
-                    game_manager(connection, request.message);
-                    break;
-            }
+        	if (request.hasOwnProperty('target')) {
+	            switch(request.target) {
+	                case 'matchmaker':
+	                    matchmaker(connection, request.message);
+	                    break;
+	                case 'authenticator':
+	                    authentication_module(connection, request.message);
+	                    break;
+	                case 'global-manager':
+	                    global_manager(connection, request.message);
+	                    break;
+	                case 'game-manager':
+	                    game_manager(connection, request.message);
+	                    break;
+	            }
+        	}
             console.log('Received Message: ' + message.utf8Data);
         }
     });
