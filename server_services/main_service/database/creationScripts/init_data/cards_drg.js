@@ -54,7 +54,7 @@ const cards = [
         "specs" : {
             "cost" : 1,
             "effects" : [{
-                "type" : "bonus",
+                "type" : "set",
                 "attribute" : "HP",
                 "set" : 1
             }]
@@ -143,7 +143,7 @@ const cards = [
                 "target" : {
                     "conditions" :[{
                         "type" : "location",
-                        "location" : "local-board"
+                        "location" : "adversary-board"
                     }]
                 },
                 "potency" : {
@@ -153,7 +153,8 @@ const cards = [
                         "conditions" : [{
                             "type" : "family",
                             "family" : "dragon",
-                            "fulfilled" : 1
+                            "fulfilled" : 1,
+                            "location" : "local-board"
                         }]
                     }]
                 }
@@ -202,6 +203,7 @@ const cards = [
                         "attribute" : "HP",
                         "potency" : 2
                     }, {
+                        "type" : "attribute",
                         "target" : {
                             "conditions" : [{
                                 "type" : "family",
@@ -226,19 +228,19 @@ const cards = [
             "Atk" : "2",
             "cost" : "5",
             "abilities" : {
-                "bonus" : {
+                "bonus" : [{
                    "type" : "ability",
                     "target" : {
                         "type" : "family",
                         "family" : "dragon",
                         "location" : "local-board"
                     },
-                    "abilities" : [{
+                    "ability" : {
                         "battlecry" : {
                             "charge" : ""
                         }
-                    }]
-                }  
+                    }
+                }]
             }
             }
     },  {
@@ -252,21 +254,21 @@ const cards = [
             "Atk" : "3",
             "cost" : "5",
             "abilities" : {
-                "bonus" : {
+                "bonus" : [{
                    "type" : "ability",
                     "target" : {
                         "type" : "family",
                         "family" : "dragon",
                         "location" : "local-board"
                     },
-                    "abilities" : [{
+                    "ability" : {
                         "battlecry" : {
                             "type" : "draw",
                             "target" : "local",
                             "potency" : 1
                         }
-                    }]
-                }  
+                    }
+                } ] 
             }
         }
     },{

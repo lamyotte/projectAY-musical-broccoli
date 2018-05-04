@@ -246,7 +246,7 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 			potency = effect.potency.default;
 			for (let i = 0; i < effect.potency.conditions.length; i++) {
 				if (validateConditions(gameData, effect.potency.conditions[i].conditions)) {
-					potency = effect.potency.connections[i].potency;
+					potency = effect.potency.conditions[i].potency;
 					break;
 				}
 			}
@@ -264,7 +264,7 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 						return;
 					}
 					dmgTarget(potency, target);
-					clearDead(target, sendMessage)
+					clearDead(gameData, target, sendMessage)
 				}
 				break;
 			}
@@ -277,7 +277,7 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 						return;
 					}
 					healTarget(potency, target);
-					clearDead(target, sendMessage)
+					clearDead(gameData, target, sendMessage)
 				}
 				break;
 			}
@@ -297,9 +297,7 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 					return;
 				}
 				let morph = await cards.getById(effect.morph);
-				morph.cHP = morph.specs.HP;
-				morph.cAtk = morph.specs.cAtk;
-				target.board[target.index] = morph
+				morphCreatureCard(gameData, morph, target);
 				break;
 
 			}
@@ -308,8 +306,32 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 				break;
 			}
 			case 'bonus' : {
-				// applyBonuses(gameData, )
+				applyBonuses(gameData, effect.bonus, card.uid, message);
 				break;
+			}
+			case 'set' : {
+				switch (effect.attribute) {
+					case 'HP' : {
+						let target = handleTarget(gameData, effect.target, message);
+						if (target === false) {
+							console.log('invalid target');
+							return;
+						}
+						target.board[target.index].cHP = effect.set;
+						target.board[target.index].cMaxHP = effect.set;
+						break;
+					}
+					case 'Atk' : {
+						let target = handleTarget(gameData, effect.target, message);
+						if (target === false) {
+							console.log('invalid target');
+							return;
+						}
+						target.board[target.index].cAtk = effect.set;
+						break;
+					}
+
+				}	
 			}
 		}
 	}
@@ -356,38 +378,47 @@ function validateConditions(gameData, conditions) {
 
 function validateTargetCondition(gameData, conditions, target) {
 	for (let i = 0; i < conditions.length; i++) {
-		let conditon = conditions[i];
+		let condition = conditions[i];
 		switch (condition.type) {
 			case "family" : {
-				if (target.family != condition.family)
+				if (target.board[target.index].specs.family != condition.family)
 					return false;
 			}
 			case "location" : {
-				if (condition.location == 'local-board') {
-					if (target.board != gameData[gameData.playing].board)
-						return false;
-				}
-				else if (condition.location == 'adversary-board') {
-					if (target.board == gameData[gameData.playing].board)
-						return false; 
-				}
-				else if (condition.location == 'adversary') {
-					if (target.hasOwnProperty('HP')) {
-						if (target.id == gameData[gameData.playing].id)
-							return false;
-					}
-					else {
-						if (target.board == gameData[gameData.playing].board)
-							return false;
-					}
-				}
-				else if (condition.location == 'local') {
-					if (target.hasOwnProperty('HP')) {
-						if (target.id != gameData[gameData.playing].id)
-							return false;
-					}
-					else {
+				switch (condition.location) {
+					case 'local-board' : {
 						if (target.board != gameData[gameData.playing].board)
+							return false;
+						break;
+					}
+					case 'adversary-board' : {
+						if (target.board == gameData[gameData.playing].board)
+							return false; 
+						break;
+					}
+					case 'adversary' : {
+						if (target.hasOwnProperty('HP')) {
+							if (target.id == gameData[gameData.playing].id)
+								return false;
+						}
+						else {
+							if (target.board == gameData[gameData.playing].board)
+								return false;
+						}
+						break;
+					}
+					case 'local' : {
+						if (target.hasOwnProperty('HP')) {
+							if (target.id != gameData[gameData.playing].id)
+								return false;
+						}
+						else {
+							if (target.board != gameData[gameData.playing].board)
+								return false;
+						}
+					}
+					case 'board' : {
+						if (target.hasOwnProperty('tag'))
 							return false;
 					}
 				}
@@ -396,7 +427,18 @@ function validateTargetCondition(gameData, conditions, target) {
 	}
 	return true;
 }
- 
+
+function morphCreatureCard(gameData, card, target) {
+	if (card.specs.abilities.hasOwnProperty('bonus')) {
+		applyBonuses(gameData, card.specs.abilities.bonus, card.uid);
+	}
+	target.board[target.index] = card;
+	target.board[target.index].cHP = target.board[target.index].specs.HP;
+	target.board[target.index].cMaxHP = target.board[target.index].specs.HP;
+	target.board[target.index].cAtk = target.board[target.index].specs.Atk;
+	target.board[target.index].actions = 0;
+	target.board[target.index].status = [];
+}
 async function playCreatureCard(gameData, card, index, player, message, sendMessage) {
 	let adversary = (gameData.playing == 'player1') ? 'player2' : 'player1';
 
@@ -441,7 +483,7 @@ async function playCreatureCard(gameData, card, index, player, message, sendMess
 				}
 				else {
 					dmgTarget(card.specs.abilities.battlecry.potency, target);
-					clearDead(target, sendMessage);
+					clearDead(gameData, target, sendMessage);
 				}
 				break;
 			}
@@ -480,34 +522,58 @@ function applyBonuses(gameData, bonuses, issuer, message) {
 		let bonus = bonuses[i];
 		let targets = handleTarget(gameData, bonus.target, message);
 		let target;
+		if (!targets) {
+			console.log("Invalid target");
+			return -1;
+		}
 		if (targets.constructor !== Array) {
 			if (targets.hasOwnProperty('index') && !targets.hasOwnProperty('board'))
 				targets = targets.index;
 			else if(!targets.hasOwnProperty('index'))
 				targets = targets.board;
 			else 
-				targets = [targets];
+				targets = [targets.board[targets.index]];
 		}
 		for (let j = 0; j < targets.length; j++) {
 			target = targets[j];
-			if (bonus.target.attribute == "HP") {
-				target.cHP += bonus.potency;
-				target.cMaxHP += bonus.potency;
+			switch (bonus.type) {
+				case 'attribute' : {
+					switch (bonus.attribute) {
+						case 'HP' : {
+							target.cHP += bonus.potency;
+							target.cMaxHP += bonus.potency;
+							break;
+						}
+						case 'Atk' : {
+							target.cAtk += bonus.potency;
+							break;
+						}
+					}
+					if (target.status.hasOwnProperty(issuer)) {
+						target.status[issuer].push({
+							"type" : "bonus",
+							"potency" : bonus.potency,
+							"attribute" : bonus.attribute
+						})
+					}
+					else {
+						target.status[issuer] = [{
+							"type" : "bonus",
+							"potency" : bonus.potency,
+							"attribute" : bonus.attribute
+						}]
+					}
+					break;
+				}
+				case 'ability' : {
+					console.log('ability bonus to do');
+					
+					break;
+				}
 			}
-			else if (bonus.target.attribute == "Atk") {
-				target.cAtk += bonus.potency;
-			}
-			target.status.push({
-				"type" : "bonus",
-				"potency" : bonus.potency,
-				"attribute" : bonus.target.attribute,
-				"issuer" : issuer
-			});
 		}	
 	}
 }
-
-
 
 function findTarget(gameData, uid) {
 	// Multi param targetting
@@ -520,7 +586,7 @@ function findTarget(gameData, uid) {
 				if (uid.location == 'local-board') {
 					for (let i = 0; i < playing.board.length; i++) {
 						if (playing.board[i].specs.family == uid.family)
-							targets.push(i);
+							targets.push(playing.board[i]);
 					}
 				}
 				/// ...
@@ -705,7 +771,7 @@ function healTarget(potency, target) {
 	}
 }
 
-function clearDead(target, sendMessage) {
+function clearDead(gameData, target, sendMessage) {
 	// Look for player death
 	if (target.hasOwnProperty('tag')) {
 		if (target.HP <= 0) {
@@ -723,7 +789,53 @@ function clearDead(target, sendMessage) {
 	// Look for one specific target
 	else {
 		if (target.board[target.index].cHP <= 0) {
+			if (target.board[target.index].specs.abilities.hasOwnProperty('bonus'))
+				removeBonus(gameData, target.board[target.index].uid);
 			target.board.splice(target.index, 1);
+		}
+	}
+}
+
+function removeBonus(gameData, issuer) {
+	let highBoard;
+	let lowBoard;
+	if (gameData.player1.board.length > gameData.player2.board.length) {
+		lowBoard = gameData.player2.board;
+		highBoard = gameData.player1.board;
+
+	}
+	else {
+		lowBoard = gameData.player1.board;
+		highBoard = gameData.player2.board;
+	}
+	for (let i = 0; i < lowBoard.length; i++) {
+		revertAttribute(lowBoard[i], lowBoard[i].status[issuer]);
+		revertAttribute(highBoard[i], highBoard[i].status[issuer]);
+		delete lowBoard[i].status[issuer];
+		delete highBoard[i].status[issuer];
+	}
+	for (let i = lowBoard.length; i < highBoard.length; i++) {
+		revertAttribute(highBoard[i], highBoard[i].status[issuer]);
+		delete highBoard[i].status[issuer];
+	}
+}
+
+function revertAttribute(target, bonuses) {
+	if (!bonuses)
+		return;
+	for (let i = 0; i < bonuses.length; i++) {
+		let bonus = bonuses[i];
+		switch (bonus.attribute) {
+			case 'HP' : {
+				target.cMaxHP -= bonus.potency;
+				if (target.cHP > target.cMaxHP)
+					target.cHP = target.cMaxHP;
+				break;
+			}
+			case 'Atk' : {
+				target.cAtk -= bonus.potency;
+				break;
+			}
 		}
 	}
 }
@@ -770,7 +882,7 @@ function useHeroPower(message, gameData, sendMessage) {
 				}
 			}
 			dmgTarget(gameData[gameData.playing].job.specs.potency, target);
-			clearDead(target, sendMessage);
+			clearDead(gameData, target, sendMessage);
 			break;
 		}
 		case 'heal': {
@@ -788,7 +900,7 @@ function useHeroPower(message, gameData, sendMessage) {
 				}
 			}
 			healTarget(gameData[gameData.playing].job.specs.potency, target);
-			clearDead(target, sendMessage);
+			clearDead(gameData, target, sendMessage);
 			break;
 		}
 		case 'draw':
@@ -1049,10 +1161,12 @@ async function route (connection, message) {
 module.exports = {
 	route,
 	initGame,
+	// Exposed for testing purposes
 	swapCards,
 	playCard,
 	attack,
 	endTurn,
 	useHeroPower,
-	pickRandomTarget
+	pickRandomTarget,
+	clearDead
 }

@@ -45,7 +45,10 @@ describe('Hero power tests', () => {
 	it('should kill targetted ennemy creature', () => {
 		gameData.player2.board.push({
     		uid: 2,
-    		cHP: 2
+			cHP: 2,
+			specs : {
+				abilities : {}
+			}
     	});
 		let message = { 
 			playerId: 1,
