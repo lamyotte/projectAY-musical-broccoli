@@ -4,6 +4,7 @@ var gameData = {
       "tag": "Livvy",
       "job": {},
       "HP" : 30,
+      "battlecries" : [],
       "hand": [{
           "id" : 1,
           "uid" : 1,
@@ -72,6 +73,7 @@ var gameData = {
       "tag": "Phil714",
       "job": {},
       "HP" : 30,
+      "battlecries" : [],
       "hand": [],
       "manapool": 0,
       "mana": 0,

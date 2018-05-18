@@ -86,9 +86,9 @@ const cards = [
             "Atk" : "4",
             "cost" : "3",
             "abilities" : {
-                "battlecry" : {
+                "battlecry" : [{
                     "type" : "charge"
-                }
+                }]
             }
         }
     },
@@ -189,7 +189,7 @@ const cards = [
             "Atk" : "4",
             "cost" : "4",
             "abilities" : {
-                "battlecry" : {
+                "battlecry" : [{
                     "type" : "bonus",
                     "bonus" : [{
                         "type" : "attribute",
@@ -214,7 +214,7 @@ const cards = [
                         "attribute" : "Atk",
                         "potency" : 2
                     }]
-                }  
+                }]
             }
             }
     }, {
@@ -236,9 +236,9 @@ const cards = [
                         "location" : "local-board"
                     },
                     "ability" : {
-                        "battlecry" : {
+                        "battlecry" : [{
                             "charge" : ""
-                        }
+                        }]
                     }
                 }]
             }
@@ -262,11 +262,11 @@ const cards = [
                         "location" : "local-board"
                     },
                     "ability" : {
-                        "battlecry" : {
+                        "battlecry" : [{
                             "type" : "draw",
                             "target" : "local",
                             "potency" : 1
-                        }
+                        }]
                     }
                 } ] 
             }

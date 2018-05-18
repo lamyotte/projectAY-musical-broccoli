@@ -43,7 +43,8 @@ function initGame(player1, player2) {
               board: [],
               weapon: {},
               HP: 30,
-              powerActions: 1
+			  powerActions: 1,
+			  battlecries : []
           },
           player2: {
               id: player2.id,
@@ -58,7 +59,8 @@ function initGame(player1, player2) {
               board: [],
               weapon: {},
               HP: 30,
-              powerActions: 1
+			  powerActions: 1,
+			  battlecries : []
           },
           playing: pickRandom(['player1', 'player2']),
           status: GameStatus.swaping
@@ -376,23 +378,23 @@ function validateConditions(gameData, conditions) {
 	return true;
 }
 
-function validateTargetCondition(gameData, conditions, target) {
+function validateTargetCondition(gameData, conditions, target, board) {
 	for (let i = 0; i < conditions.length; i++) {
 		let condition = conditions[i];
 		switch (condition.type) {
 			case "family" : {
-				if (target.board[target.index].specs.family != condition.family)
+				if (target.specs.family != condition.family)
 					return false;
 			}
 			case "location" : {
 				switch (condition.location) {
 					case 'local-board' : {
-						if (target.board != gameData[gameData.playing].board)
+						if (board != gameData[gameData.playing].board)
 							return false;
 						break;
 					}
 					case 'adversary-board' : {
-						if (target.board == gameData[gameData.playing].board)
+						if (board == gameData[gameData.playing].board)
 							return false; 
 						break;
 					}
@@ -402,7 +404,7 @@ function validateTargetCondition(gameData, conditions, target) {
 								return false;
 						}
 						else {
-							if (target.board == gameData[gameData.playing].board)
+							if (board == gameData[gameData.playing].board)
 								return false;
 						}
 						break;
@@ -413,7 +415,7 @@ function validateTargetCondition(gameData, conditions, target) {
 								return false;
 						}
 						else {
-							if (target.board != gameData[gameData.playing].board)
+							if (board != gameData[gameData.playing].board)
 								return false;
 						}
 					}
@@ -442,10 +444,18 @@ function morphCreatureCard(gameData, card, target) {
 async function playCreatureCard(gameData, card, index, player, message, sendMessage) {
 	let adversary = (gameData.playing == 'player1') ? 'player2' : 'player1';
 
+	for (let i = 0; i < gameData[player].battlecries.length; i++) {
+		if (validateTargetCondition(gameData, gameData[player].battlecries[i].target, card, null)) {
+			card.specs.abilities.battlecry.push(battlecries[i].battlecry);
+		}
+	}
+
 	if (card.specs.abilities.hasOwnProperty('bonus')) {
 		applyBonuses(gameData, card.specs.abilities.bonus, card.uid);
 	}
-
+	// TO DO
+	// check sides bonus
+	// check board wide bonus
 	gameData[player].board.splice(index, 0, card);
 	gameData[player].board[index].cHP = gameData[player].board[index].specs.HP;
 	gameData[player].board[index].cMaxHP = gameData[player].board[index].specs.HP;
@@ -453,51 +463,51 @@ async function playCreatureCard(gameData, card, index, player, message, sendMess
 	gameData[player].board[index].actions = 0;
 	gameData[player].board[index].status = [];
 
-	console.log(gameData[player].board);
-	// check sides bonus
-	// check board wide bonus
+
 	if (gameData[player].board[index].specs.abilities.hasOwnProperty('battlecry')) {
-		let battlecry = gameData[player].board[index].specs.abilities.battlecry;
-		switch (battlecry.type) {
-			case 'charge' : {
-				gameData[player].board[index].actions += 1;
-				break;
-			}
-			case 'heal' : {
-				let target = handleTarget(gameData, battlecry.target, message);
-				if (target === false) {
-					/// invalid target stop !
-					console.log("DIDNT FIND IT!");
-					return;
+		for (let i = 0; i < gameData[player].board[index].specs.abilities.battlecry.length; i++) {
+			let battlecry = gameData[player].board[index].specs.abilities.battlecry[i];
+			switch (battlecry.type) {
+				case 'charge' : {
+					gameData[player].board[index].actions += 1;
+					break;
 				}
-				else {
-					healTarget(card.specs.abilities.battlecry.potency, target);	
+				case 'heal' : {
+					let target = handleTarget(gameData, battlecry.target, message);
+					if (target === false) {
+						/// invalid target stop !
+						console.log("DIDNT FIND IT!");
+						return;
+					}
+					else {
+						healTarget(battlecry.potency, target);	
+					}
+					break;
 				}
-				break;
-			}
-			case 'dmg' : {
-				let target = handleTarget(gameData, battlecry.target, message);
-				if (target == -1) {
-					// invalid
-					return;
+				case 'dmg' : {
+					let target = handleTarget(gameData, battlecry.target, message);
+					if (target == -1) {
+						// invalid
+						return;
+					}
+					else {
+						dmgTarget(battlecry.potency, target);
+						clearDead(gameData, target, sendMessage);
+					}
+					break;
 				}
-				else {
-					dmgTarget(card.specs.abilities.battlecry.potency, target);
-					clearDead(gameData, target, sendMessage);
+				case 'draw' : {
+					gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
+					break;
 				}
-				break;
-			}
-			case 'draw' : {
-				gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
-				break;
-			}
-			case 'bonus' : {
-				applyBonuses(gameData, battlecry.bonus, card.uid, message);
-				break;
-			}
-			case 'summon' : {
-				await summonCard(gameData, battlecry, battlecry.potency, player, sendMessage);
-				break;
+				case 'bonus' : {
+					applyBonuses(gameData, battlecry.bonus, card.uid, message);
+					break;
+				}
+				case 'summon' : {
+					await summonCard(gameData, battlecry, battlecry.potency, player, sendMessage);
+					break;
+				}
 			}
 		}
 	}
@@ -509,7 +519,7 @@ function handleTarget(gameData, targeting, message) {
 	}
 	else if (targeting.hasOwnProperty('conditions')) {
 		let target = findTarget(gameData, message.defender);
-		return (validateTargetCondition(gameData, targeting.conditions, target)) ? target : false;
+		return (validateTargetCondition(gameData, targeting.conditions, target.board[target.index], target.board)) ? target : false;
 	}
 	else {
 		console.log("finding specific");
@@ -520,58 +530,67 @@ function handleTarget(gameData, targeting, message) {
 function applyBonuses(gameData, bonuses, issuer, message) {
 	for (let i = 0; i < bonuses.length; i++) {
 		let bonus = bonuses[i];
-		let targets = handleTarget(gameData, bonus.target, message);
-		let target;
-		if (!targets) {
-			console.log("Invalid target");
-			return -1;
+		if (bonus.type == 'ability') {
+			if (bonus.ability.hasOwnProperty('battlecry')) {
+				gameData[gameData.playing].battlecries.push({
+					target : bonus.target,
+					battlecry : bonus.ability
+				})
+			}
 		}
-		if (targets.constructor !== Array) {
-			if (targets.hasOwnProperty('index') && !targets.hasOwnProperty('board'))
-				targets = targets.index;
-			else if(!targets.hasOwnProperty('index'))
-				targets = targets.board;
-			else 
-				targets = [targets.board[targets.index]];
-		}
-		for (let j = 0; j < targets.length; j++) {
-			target = targets[j];
-			switch (bonus.type) {
-				case 'attribute' : {
-					switch (bonus.attribute) {
-						case 'HP' : {
-							target.cHP += bonus.potency;
-							target.cMaxHP += bonus.potency;
-							break;
+		else {
+			let targets = handleTarget(gameData, bonus.target, message);
+			let target;
+			if (!targets) {
+				console.log("Invalid target");
+				return -1;
+			}
+			if (targets.constructor !== Array) {
+				if (targets.hasOwnProperty('index') && !targets.hasOwnProperty('board'))
+					targets = targets.index;
+				else if(!targets.hasOwnProperty('index'))
+					targets = targets.board;
+				else 
+					targets = [targets.board[targets.index]];
+			}
+			for (let j = 0; j < targets.length; j++) {
+				target = targets[j];
+				switch (bonus.type) {
+					case 'attribute' : {
+						switch (bonus.attribute) {
+							case 'HP' : {
+								target.cHP += bonus.potency;
+								target.cMaxHP += bonus.potency;
+								break;
+							}
+							case 'Atk' : {
+								target.cAtk += bonus.potency;
+								break;
+							}
 						}
-						case 'Atk' : {
-							target.cAtk += bonus.potency;
-							break;
+						if (target.status.hasOwnProperty(issuer)) {
+							target.status[issuer].push({
+								"type" : "bonus",
+								"potency" : bonus.potency,
+								"attribute" : bonus.attribute
+							})
 						}
+						else {
+							target.status[issuer] = [{
+								"type" : "bonus",
+								"potency" : bonus.potency,
+								"attribute" : bonus.attribute
+							}]
+						}
+						break;
 					}
-					if (target.status.hasOwnProperty(issuer)) {
-						target.status[issuer].push({
-							"type" : "bonus",
-							"potency" : bonus.potency,
-							"attribute" : bonus.attribute
-						})
+					case 'ability' : {
+						console.log('ability bonus to do');
+						break;
 					}
-					else {
-						target.status[issuer] = [{
-							"type" : "bonus",
-							"potency" : bonus.potency,
-							"attribute" : bonus.attribute
-						}]
-					}
-					break;
-				}
-				case 'ability' : {
-					console.log('ability bonus to do');
-					
-					break;
 				}
 			}
-		}	
+		}
 	}
 }
 
@@ -685,7 +704,7 @@ function pickRandomTargets(gameData, limit, repetition) {
 	let targets = [];
 	let max;
 	if (limit == "adversary-board") {
-		board = [...Array(gameData.notPlaying.board.length).keys()];
+		board = [...Array(notPlaying.board.length).keys()];
 	}
 	else if (limit == "adversary") {
 		board = [...Array(gameData.notPlaying.board.length+1).keys()];

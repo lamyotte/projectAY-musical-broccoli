@@ -108,10 +108,10 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" :{
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "dmg",
                     "potency" : "2"
-                }
+                }]
             }
           }
       });
@@ -133,7 +133,7 @@ describe('Play Card Tests', () => {
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
       // Check that the target card died
-      assert.isTrue(gameData.player2.board.length == 0);
+      assert.equal(gameData.player2.board.length, 0);
     });
     it('play creature with dmg battlecry damage', async () => {
       gameData.player2.board.push({
@@ -161,10 +161,10 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "dmg",
                     "potency" : "2"
-                }
+                }]
             }
           }
       });
@@ -188,7 +188,7 @@ describe('Play Card Tests', () => {
       // Check that the target card is still there
       assert.isTrue(gameData.player2.board.length == 1);
       // Check that the target card is missing hp
-      assert.isTrue(gameData.player2.board[0].cHP == 1);
+      assert.equal(gameData.player2.board[0].cHP, 1);
     });
     it('play creature with heal battlecry', async () => {
       gameData.player1.board.push({
@@ -216,10 +216,10 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "heal",
                     "potency" : "2"
-                }
+                }]
             }
           }
       });
@@ -241,7 +241,7 @@ describe('Play Card Tests', () => {
       // Check that the mana cost was deduced
       assert.equal(gameData.player1.mana, 0);
       // Check that the target card has healed to max hp
-      assert.isTrue(gameData.player1.board[1].cHP == 3);
+      assert.equal(gameData.player1.board[1].cHP,3);
     });
     it('play creature with charge battlecry', async () => {
       gameData.player1.board.push({
@@ -269,9 +269,9 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "charge"
-                }
+                }]
             }
           }
       });
@@ -386,7 +386,7 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                 "type" : "bonus",
                 "bonus" : [{
                     "type" : "attribute",
@@ -411,7 +411,7 @@ describe('Play Card Tests', () => {
                     "attribute" : "Atk",
                     "potency" : 2
                 }]
-            } 
+            }]
             }
           }
       });
@@ -461,9 +461,9 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "charge"
-                }
+                }]
             }
           }
       });
@@ -511,9 +511,59 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "charge"
-                }
+                }]
+            }
+          }
+      });
+      let message = {
+        playerId: 1,
+        card: 12,
+        index: 0,
+        defender: 11
+      };
+      await playCard(message, gameData, (message) => {});
+      // Check that the board has 2 cards
+      assert.isTrue(gameData.player1.board.length == 2);
+      // Check that the card was placed
+      assert.equal(gameData.player1.board[0].uid, 12);
+      // Check that the card has no actions
+      assert.equal(gameData.player1.board[0].actions, 1);
+      // Check that the card was removed from hand
+      assert.isTrue(!gameData.player1.hand.some(card => card.uid === 22));
+      // Check that the mana cost was deduced
+      assert.equal(gameData.player1.mana, 0);
+    });
+    it('play creature battlecry bonus', async () => {
+      gameData.player1.board.push({
+          "uid" : 11,
+          "id" : 1,
+          "name" : "TestCard",
+          "type" : "creature",
+          "cHP" : 2,
+          "cAtk" : 1,
+          "specs" : {
+            "cost" : 1,
+            "HP" : 3,
+            "Atk" : 1,
+            "abilities" :{
+            }
+          }
+      });
+      gameData.player1.hand.push({
+          "uid" : 12,
+          "id" : 1,
+          "name" : "TestCard",
+          "type" : "creature",
+          "specs" : {
+            "cost" : 1,
+            "HP" : 1,
+            "Atk" : 1,
+            "abilities" : {
+              "battlecry" : [{
+                    "type" : "charge"
+                }]
             }
           }
       });
@@ -561,9 +611,9 @@ describe('Play Card Tests', () => {
             "HP" : 1,
             "Atk" : 1,
             "abilities" : {
-              "battlecry" : {
+              "battlecry" : [{
                     "type" : "charge"
-                }
+                }]
             }
           }
       });
@@ -788,6 +838,44 @@ describe('Play Card Tests', () => {
                     (gameData.player2.board[0].cHP == 5 && gameData.player2.board[1].cHP == 4));
       assert.isTrue(gameData.player2.board.length == 2);
       assert.isTrue(gameData.player1.mana == 0);
+    });
+    it('should play random spell twice different targets garantee', async () => {
+      gameData.player1.mana = 4;
+      gameData.player1.hand =[{
+        "uid": 555,
+        "name" : "Dragonfire Dive",
+        JobId : 1,
+        "type" : "spell",
+        "specs" : {
+            "cost" : 4,
+            "effects" : [{
+                "type" : "dmg",
+                "potency" : 3,
+                "target" : {
+                    "type" : "rand",
+                    "location" : "adversary-board",
+                    "repetition" : 2
+                }
+            }]
+        }
+    }]; 
+      gameData.player2.board.push(...[{
+        'uid' : 1,
+        'cHP' : 5
+      },{
+        'uid' : 2,
+        'cHP' : 6
+      }])
+      let message = {
+        playerId: 1,
+        card: 555,
+      };
+      await playCard(message, gameData, () => {});
+      assert.equal(gameData.player1.hand.length, 0);
+      assert.equal(gameData.player2.board.length, 2);
+      assert.equal(gameData.player2.board[0].cHP, 2);
+      assert.equal(gameData.player2.board[1].cHP, 3);
+      assert.equal(gameData.player1.mana, 0);
     });
     it('should play bonus spell on familly', async () => {
       gameData.player1.mana = 1;

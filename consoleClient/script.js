@@ -1,8 +1,8 @@
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-//var connection = new WebSocket('ws:/localhost:3000', 'echo-protocol');
+var connection = new WebSocket('ws:/localhost:3000', 'echo-protocol');
 //http://10.192.181.76
-var connection = new WebSocket('ws:/10.192.181.76:3000', 'echo-protocol');
+//var connection = new WebSocket('ws:/10.192.181.76:3000', 'echo-protocol');
 
 var currentPlayer;
 var game;
