@@ -328,6 +328,24 @@ const cards = [
             "abilities" : {
             }
         }
+    },
+    {
+        "id": 100,
+        "name" : "Echo's Blessing",
+        "type" : "spell",
+        "specs" : {
+            "cost" : 0,
+            "effects" : [{
+                "type" : "bonus",
+                "potency" : 1,
+                "bonus" : [{
+                    "target" : 'local',
+                    "type" : 'attribute',
+                    "attribute" : "mana",
+                    "potency" : 1
+                }]
+            }]
+        }
     }
 ]
 

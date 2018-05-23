@@ -3,8 +3,11 @@ const decks = require('./database/controllers/decks');
 const cards = require('./database/controllers/cards');
 const deck_card = require('./database/controllers/deck_card');
 
-const startingCards = 3; 
-const maxBoardSize = 5; 
+const STARTING_CARDS_NUMBER_FIRST = 3; 
+const STARTING_CARDS_NUMBER_SECOND = 4; 
+const MAX_BOARD_SIZE = 7;
+const MAX_HAND_SIZE = 10; 
+const COIN_ID = 100;
 
 var levelup = require('levelup')
 var leveldown = require('leveldown')
@@ -34,7 +37,7 @@ function initGame(player1, player2) {
               id: player1.id,
               tag: data[0].gamerTag,
               job: data[2].job,
-              hand: drawCards(data[2].cards,startingCards),
+              hand: [],
               manapool: 0,
               mana: 0,
               deck: data[2].cards,
@@ -50,7 +53,7 @@ function initGame(player1, player2) {
               id: player2.id,
               tag: data[1].gamerTag,
               job: data[3].job,
-              hand: drawCards(data[3].cards,startingCards),
+              hand: [],
               manapool: 0,
               mana: 0,
               deck: data[3].cards,
@@ -66,6 +69,7 @@ function initGame(player1, player2) {
           status: GameStatus.swaping
 		};
 		allocateIds(gameData);
+		setUpHands(gameData);
 		lastId++;
 		return db.put(lastId, JSON.stringify(gameData));
 	})
@@ -101,15 +105,33 @@ function initGame(player1, player2) {
 	
 }
 
+function setUpHands(gameData) {
+	let firstPlayer = (gameData.playing == 'player1') ? gameData.player1 : gameData.player2;
+	let secondPlayer = (gameData.playing == 'player1') ? gameData.player2 : gameData.player1;
+	
+	firstPlayer.hand = drawCards(firstPlayer.deck, STARTING_CARDS_NUMBER_FIRST);
+	secondPlayer.hand = drawCards(secondPlayer.deck, STARTING_CARDS_NUMBER_SECOND);
+}
+
+async function giveCoin(gameData) {
+	let secondPlayer = (gameData.playing == 'player1') ? gameData.player2 : gameData.player1;
+	let coin = await cards.getById(COIN_ID);
+	coin.uid = gameData.nextID;
+	gameData.nextID++;
+	secondPlayer.hand.push(coin);
+}
+
 function allocateIds(gameData) {
 	gameData.nextID = 1;
 	for (let i = 0; i < gameData.player1.deck.length; i++) {
 		gameData.player1.deck[i].uid = gameData.nextID;
 		gameData.nextID++;
+		gameData.player2.deck[i].uid = gameData.nextID;
+		gameData.nextID++;
 	}
 }
 
-function swapCards(message, gameData, sendMessage) {
+async function swapCards(message, gameData, sendMessage) {
 	let player = (gameData.player1.id == message.playerId) ? 'player1' : 'player2';
 	if (gameData[player].hasOwnProperty('swapped')) {
 		sendMessage(connections[gameData[player].id], 'error', 'Cards already swapped please wait');
@@ -133,14 +155,15 @@ function swapCards(message, gameData, sendMessage) {
 	if(gameData.player1.hasOwnProperty('swapped') && gameData.player2.hasOwnProperty('swapped')) {
 		sendMessage(connections[gameData.player1.id], 'swap-cards-completed', gameData.player2.swapped);
 		sendMessage(connections[gameData.player2.id], 'swap-cards-completed', gameData.player1.swapped);
-		startGame(message, gameData, sendMessage);
+		await startGame(message, gameData, sendMessage);
 	}
 }
 
-function startGame(message, gameData, sendMessage) {
+async function startGame(message, gameData, sendMessage) {
 	let playing = gameData.playing;
 	let notPlaying = (playing == 'player1') ? 'player2' : 'player1';
-	gameData[gameData.playing].hand.push(...drawCards(gameData[gameData.playing].deck, 1));
+	await giveCoin(gameData);
+	addCardsToHand(gameData[playing]);
 	gameData[gameData.playing].mana = 1;
 	gameData[gameData.playing].manapool = 1;
 	sendMessage(connections[gameData[playing].id], 'start-turn', {
@@ -166,7 +189,7 @@ function endTurn(message, gameData, sendMessage) {
 	gameData[gameData.playing].manapool = (gameData[gameData.playing].manapool < 10) ? 
 											gameData[gameData.playing].manapool + 1 : 
 											gameData[gameData.playing].manapool; 
-	gameData[gameData.playing].hand.push(...drawCards(gameData[gameData.playing].deck, 1));
+	addCardsToHand(gameData[gameData.playing]);
 	gameData[gameData.playing].mana = gameData[gameData.playing].manapool;
 	for (let i in gameData[gameData.playing].board) {
 		gameData[gameData.playing].board[i].actions = 1;
@@ -298,7 +321,7 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 					console.log('invalid target');
 					return;
 				}
-				target.hand.push(...drawCards(target.deck, potency));	
+				addCardsToHand(target, potency);	
 				break;
 			}
 			case 'morph' : {
@@ -522,7 +545,7 @@ async function playCreatureCard(gameData, card, index, player, message, sendMess
 					break;
 				}
 				case 'draw' : {
-					gameData[player].hand.push(...drawCards(gameData[player].deck, battlecry.potency));
+					addCardsToHand(gameData[player], battlecry.potency);
 					break;
 				}
 				case 'bonus' : {
@@ -577,6 +600,10 @@ function applyBonus(target, issuer, bonus) {
 					target.cAtk += bonus.potency;
 					break;
 				}
+				case 'mana' : {
+					target.mana += bonus.potency;
+					return;
+				}
 			}
 			if (target.status.hasOwnProperty(issuer)) {
 				target.status[issuer].push({
@@ -624,7 +651,7 @@ function applyBonus(target, issuer, bonus) {
 function applyBonuses(gameData, bonuses, issuer, message) {
 	for (let i = 0; i < bonuses.length; i++) {
 		let bonus = bonuses[i];
-		if (bonus.type == 'ability' && !bonus.target.hasOwnProperty('conditions')) {
+		if (bonus.type == 'ability' && !bonus.target.hasOwnProperty('conditions')) { // Deprecated??? 
 			if (bonus.ability.hasOwnProperty('battlecry')) {
 				gameData[gameData.playing].battlecries.push({
 					target : bonus.target,
@@ -640,7 +667,10 @@ function applyBonuses(gameData, bonuses, issuer, message) {
 				return -1;
 			}
 			if (targets.constructor !== Array) {
-				if (targets.hasOwnProperty('index') && !targets.hasOwnProperty('board'))
+				if (targets.hasOwnProperty('tag')) {
+					targets = [targets]
+				}
+				else if (targets.hasOwnProperty('index') && !targets.hasOwnProperty('board'))
 					targets = targets.index;
 				else if(!targets.hasOwnProperty('index'))
 					targets = targets.board;
@@ -1094,7 +1124,7 @@ function isCardValid(index, gameData, player, sendMessage) {
 		return false;
 	}
 	if ( gameData[player].hand[index].type == 'creature')
-		if (gameData[player].board.length == maxBoardSize) {
+		if (gameData[player].board.length == MAX_BOARD_SIZE) {
 			sendMessage(connections[gameData[player].id], 'error', 'No space for this creature');
 			return false;
 		}
@@ -1249,6 +1279,18 @@ function drawCards(deck, nb=1) {
 	return cards;
 }
 
+function addCardsToHand(player, nb=1) {
+	for(var i = 0; i < nb; i++) {
+		let index = Math.floor(Math.random()*(player.deck.length-1));
+		let select = player.deck[index];
+		player.deck.splice(index, 1);
+		if (player.hand.length >= MAX_HAND_SIZE) {
+			break;
+		}
+		player.hand.push(select);
+	}
+}
+
 function sendMessage(connection, command, message) {
 	connection.sendUTF(JSON.stringify({
 			issuer: 'game-manager',
@@ -1275,7 +1317,7 @@ async function route (connection, message) {
 			endTurn(message, gameData, sendMessage);
 			break;
 		case 'swap-cards':
-			swapCards(message, gameData, sendMessage);
+			await swapCards(message, gameData, sendMessage);
 			break;
 		case 'play-card':
 			await playCard(message, gameData, sendMessage);
