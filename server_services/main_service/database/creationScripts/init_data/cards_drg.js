@@ -6,9 +6,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "1",
-            "Atk" : "1",
-            "cost" : "1",
+            "HP" : 1,
+            "Atk" : 1,
+            "cost" : 1,
             "abilities" : {
                 "bonus" : [{
                         "type" : "attribute",
@@ -82,9 +82,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "2",
-            "Atk" : "4",
-            "cost" : "3",
+            "HP" : 2,
+            "Atk" : 4,
+            "cost" : 3,
             "abilities" : {
                 "battlecry" : [{
                     "type" : "charge"
@@ -99,9 +99,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "4",
-            "Atk" : "2",
-            "cost" : "3",
+            "HP" : 4,
+            "Atk" : 2,
+            "cost" : 3,
             "abilities" : {
                 "bonus" : [{
                     "type" : "attribute",
@@ -123,9 +123,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "4",
-            "Atk" : "4",
-            "cost" : "3",
+            "HP" : 4,
+            "Atk" : 4,
+            "cost" : 3,
             "abilities" : {
                 "taunt" : ""
             }
@@ -185,9 +185,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "3",
-            "Atk" : "4",
-            "cost" : "4",
+            "HP" : 3,
+            "Atk" : 4,
+            "cost" : 4,
             "abilities" : {
                 "battlecry" : [{
                     "type" : "bonus",
@@ -213,7 +213,20 @@ const cards = [
                         },
                         "attribute" : "Atk",
                         "potency" : 2
-                    }]
+                    }, {
+                        "type" : "ability",
+                         "target" : {
+                            "conditions" : [{
+                                "type" : "family",
+                                "family" : "dragon",
+                                "location" : "local-board"
+                            }]
+                         },
+                         "ability" : {
+                             "taunt" : ""
+                         }
+                     }
+                ]
                 }]
             }
             }
@@ -224,9 +237,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "5",
-            "Atk" : "2",
-            "cost" : "5",
+            "HP" : 5,
+            "Atk" : 2,
+            "cost" : 5,
             "abilities" : {
                 "bonus" : [{
                    "type" : "ability",
@@ -237,9 +250,12 @@ const cards = [
                     },
                     "ability" : {
                         "battlecry" : [{
-                            "charge" : ""
+                            "type" : "charge"
                         }]
                     }
+                }],
+                "battlecry" : [{
+                    "type" : "charge"
                 }]
             }
             }
@@ -250,9 +266,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'dragon',
-            "HP" : "2",
-            "Atk" : "3",
-            "cost" : "5",
+            "HP" : 2,
+            "Atk" : 3,
+            "cost" : 5,
             "abilities" : {
                 "bonus" : [{
                    "type" : "ability",

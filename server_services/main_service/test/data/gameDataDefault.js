@@ -83,8 +83,9 @@ var gameData = {
       "board": [],
       "weapon": {}
     },
-    playing : 'player1'
-}
+    playing : 'player1',
+    nextID : 888
+  }
 
 module.exports = {
   gameData

@@ -6,9 +6,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : 'aetherials',
-            "HP" : "6",
-            "Atk" : "3",
-            "cost" : "4",
+            "HP" : 6,
+            "Atk" : 3,
+            "cost" : 4,
             "abilities" : {
             }
         }

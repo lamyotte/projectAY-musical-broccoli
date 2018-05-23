@@ -5,10 +5,10 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-            "HP" : "1",
-            "Atk" : "2",
+            "HP" : 1,
+            "Atk" : 2,
+            "cost" : 1,
             "abilities" : {
-            "cost" : "1",
                 "battlecry" : [{
                     "type" : "heal",
                     "potency" : "2"
@@ -22,9 +22,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
         "family" : "dragon",
-        "HP" : "1",
-        "Atk" : "1",
-        "cost" : "1",
+        "HP" : 1,
+        "Atk" : 1,
+        "cost" : 1,
         "abilities" : {
             "battlecry" : [{
                 "type" : "charge"
@@ -38,9 +38,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
         "family" : "sylph",
-        "HP" : "1",
-        "Atk" : "2",
-        "cost" : "1",
+        "HP" : 1,
+        "Atk" : 2,
+        "cost" : 1,
         "abilities" : {  
         }
     }
@@ -51,9 +51,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
         "family" : "monster",
-        "HP" : "3",
-        "Atk" : "2",
-        "cost" : "2",
+        "HP" : 3,
+        "Atk" : 2,
+        "cost" : 2,
         "abilities" :{
         }
     }
@@ -63,9 +63,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "1",
-        "Atk" : "1",
-        "cost" : "2",
+        "HP" : 1,
+        "Atk" : 1,
+        "cost" : 2,
         "abilities" : {
             "battlecry" : [{
                 "type" : "draw",
@@ -81,9 +81,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
         "family" : "monster",
-        "HP" : "2",
-        "Atk" : "3",
-        "cost" : "2",
+        "HP" : 2,
+        "Atk" : 3,
+        "cost" : 2,
         "abilities" : {
         }
     }
@@ -93,9 +93,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "1",
-        "Atk" : "3",
-        "cost" : "3",
+        "HP" : 1,
+        "Atk" : 3,
+        "cost" : 3,
         "abilities" : {
             "battlecry" : [{
                 "type" : "charge"
@@ -108,9 +108,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "2",
-        "Atk" : "2",
-        "cost" : "2",
+        "HP" : 2,
+        "Atk" : 2,
+        "cost" : 2,
         "abilities" : {
             "bonus" : {
                 "type" : "atk",
@@ -124,9 +124,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "1",
-        "Atk" : "5",
-        "cost" : "3",
+        "HP" : 1,
+        "Atk" : 5,
+        "cost" : 3,
         "abilities" : {
         }
     }
@@ -136,9 +136,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "5",
-        "Atk" : "3",
-        "cost" : "4",
+        "HP" : 5,
+        "Atk" : 3,
+        "cost" : 4,
         "abilities" : {
             "taunt" : ""
         }
@@ -150,9 +150,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
         "family" : "dragon",
-        "HP" : "7",
-        "Atk" : "2",
-        "cost" : "4",
+        "HP" : 7,
+        "Atk" : 2,
+        "cost" : 4,
         "abilities" : {
         }
     }
@@ -162,9 +162,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "4",
-        "Atk" : "4",
-        "cost" : "5",
+        "HP" : 4,
+        "Atk" : 4,
+        "cost" : 5,
         "abilities" : {
             "battlecry" : [{
                 "type" : "dmg",
@@ -179,9 +179,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "2",
-        "Atk" : "5",
-        "cost" : "6",
+        "HP" : 2,
+        "Atk" : 5,
+        "cost" : 6,
         "abilities" : {
             "battlecry" : [{
                 "type" : "charge"
@@ -194,9 +194,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "7",
-        "Atk" : "6",
-        "cost" : "6",
+        "HP" : 7,
+        "Atk" : 6,
+        "cost" : 6,
         "abilities" : {
         }
     }
@@ -207,9 +207,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "1",
-        "Atk" : "1",
-        "cost" : "1",
+        "HP" : 1,
+        "Atk" : 1,
+        "cost" : 1,
         "abilities" : {
         }
     }
@@ -219,9 +219,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "3",
-        "Atk" : "3",
-        "cost" : "3",
+        "HP" : 3,
+        "Atk" : 3,
+        "cost" : 3,
         "abilities" : {
             "taunt" : ""
         }
@@ -232,9 +232,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "2",
-        "Atk" : "3",
-        "cost" : "3",
+        "HP" : 2,
+        "Atk" : 3,
+        "cost" : 3,
         "abilities" : {
             "battlecry" : [{
                 "type" : "bonus",
@@ -262,9 +262,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "5",
-        "Atk" : "4",
-        "cost" : "4",
+        "HP" : 5,
+        "Atk" : 4,
+        "cost" : 4,
         "abilities" : {
         }
     }
@@ -274,9 +274,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-        "HP" : "4",
-        "Atk" : "2",
-        "cost" : "4",
+        "HP" : 4,
+        "Atk" : 2,
+        "cost" : 4,
         "abilities" : {
             "battlecry" : [{
                 "type" : "draw",
@@ -292,9 +292,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : "dragon",
-            "HP" : "3",
-            "Atk" : "2",
-            "cost" : "2",
+            "HP" : 3,
+            "Atk" : 2,
+            "cost" : 2,
             "abilities" : {
             }
         }
@@ -304,9 +304,9 @@ const cards = [
         JobId : -1,
         "type" : "creature",
         "specs" : {
-            "HP" : "3",
-            "Atk" : "2",
-            "cost" : "3",
+            "HP" : 3,
+            "Atk" : 2,
+            "cost" : 3,
             "abilities" : {
                 "battlecry" : [{
                     "type" : "summon",
@@ -322,9 +322,9 @@ const cards = [
         "type" : "creature",
         "specs" : {
             "family" : "dragon",
-            "HP" : "1",
-            "Atk" : "1",
-            "cost" : "1",
+            "HP" : 1,
+            "Atk" : 1,
+            "cost" : 1,
             "abilities" : {
             }
         }
