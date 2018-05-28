@@ -861,10 +861,10 @@ describe('Play Card Tests', () => {
     }]; 
       gameData.player2.board.push(...[{
         'uid' : 1,
-        'cHP' : 5
+        'cHP' : 1
       },{
         'uid' : 2,
-        'cHP' : 6
+        'cHP' : 1
       }])
       let message = {
         playerId: 1,
@@ -872,9 +872,9 @@ describe('Play Card Tests', () => {
       };
       await playCard(message, gameData, () => {});
       assert.equal(gameData.player1.hand.length, 0);
-      assert.equal(gameData.player2.board.length, 2);
-      assert.equal(gameData.player2.board[0].cHP, 2);
-      assert.equal(gameData.player2.board[1].cHP, 3);
+      assert.equal(gameData.player2.board.length, 0);
+      //assert.equal(gameData.player2.board[0].cHP, 2);
+      //assert.equal(gameData.player2.board[1].cHP, 3);
       assert.equal(gameData.player1.mana, 0);
     });
     it('should play bonus spell on familly', async () => {

@@ -521,6 +521,8 @@ async function playCreatureCard(gameData, card, index, player, message, sendMess
 					break;
 				}
 				case 'heal' : {
+					if (!message.defender) 
+						return;
 					let target = handleTarget(gameData, battlecry.target, message);
 					if (target === false) {
 						/// invalid target stop !
@@ -533,6 +535,8 @@ async function playCreatureCard(gameData, card, index, player, message, sendMess
 					break;
 				}
 				case 'dmg' : {
+					if (!message.defender) 
+						return;
 					let target = handleTarget(gameData, battlecry.target, message);
 					if (target == -1) {
 						// invalid
@@ -625,7 +629,7 @@ function applyBonus(target, issuer, bonus) {
 			if (bonus.ability.hasOwnProperty('battlecry')) {
 				if (!target.specs.abilities.hasOwnProperty('battlecry'))
 					target.specs.abilities.battlecry = [];
-				target.specs.abilities.battlecry.push(bonus.ability.battlecry);
+				target.specs.abilities.battlecry.push(...bonus.ability.battlecry);
 				break;
 			}
 			else if (bonus.ability.hasOwnProperty('taunt')) {
