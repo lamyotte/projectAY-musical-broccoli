@@ -487,22 +487,10 @@ function morphCreatureCard(gameData, card, target) {
 async function playCreatureCard(gameData, card, index, player, message, sendMessage) {
 	let adversary = (gameData.playing == 'player1') ? 'player2' : 'player1';
 
-	// Deprecated see check for bonus 
-	/*for (let i = 0; i < gameData[player].battlecries.length; i++) {
-		if (validateTargetConditions(gameData, gameData[player].battlecries[i].target, card, null)) {
-			if (!card.specs.abilities.hasOwnProperty('battlecry'))
-				card.specs.abilities.battlecry = [];
-			card.specs.abilities.battlecry.push(battlecries[i].battlecry);
-		}
-	}*/
-
 	if (card.specs.abilities.hasOwnProperty('bonus')) {
 		applyBonuses(gameData, card.specs.abilities.bonus, card.uid);
 	}
 
-	// TO DO
-	// check sides bonus
-	// check board wide bonus
 	gameData[player].board.splice(index, 0, card);
 	gameData[player].board[index].cHP = gameData[player].board[index].specs.HP;
 	gameData[player].board[index].cMaxHP = gameData[player].board[index].specs.HP;
@@ -786,7 +774,7 @@ function pickRandomTarget(gameData, limit) {
 			index : pick - playing.board.length - 1
 		}
 	}
-	else {//if (pick == (playing.board.length + notPlaying.board.length + 1)) {
+	else {
 		return notPlaying;
 	}
 }
@@ -1016,9 +1004,6 @@ function endGame(gameData, sendMessage) {
 }
 
 function useHeroPower(message, gameData, sendMessage) {
-	// get job 
-	// verify params
-	// execute action
 	if (gameData[gameData.playing].powerActions == 0) {
 		console.log("no more actions");
 		return;
