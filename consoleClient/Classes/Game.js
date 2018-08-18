@@ -23,15 +23,16 @@ class Game{
 			+ " Mana: " + this.adversaryMana + "/" + this.adversaryManapool + " HP: " + this.adversaryHP);
 		writer("Board: ");
 		for (let i = 0; i < this.adversaryBoard.length; i++) {
-			writer(this.createCardStringOnBoard(this.adversaryBoard[i]));
+			writer(this.createCardStringOnBoard(this.adversaryBoard[i]), (this.adversaryBoard[i].actions > 0) ? 'teal' : 'gray');
 		}
 		writer("Your Board:")
 		for (let i = 0; i < this.localBoard.length; i++) {
-			writer(this.createCardStringOnBoard(this.localBoard[i]));
+			console.log(this.localBoard[i]);
+			writer(this.createCardStringOnBoard(this.localBoard[i]), (this.localBoard[i].actions > 0) ? 'teal' : 'gray');
 		}
 		writer("Your Hand: ");
 		for (let i = 0; i < this.hand.length; i++) {
-			writer(this.createCardStringHand(this.hand[i]));
+			writer(this.createCardStringHand(this.hand[i]), (this.hand[i].specs.cost > this.mana) ? 'red' : 'green');
 		}
 		writer("Local: " + this.local + " Deck: " + this.localDeck + " Mana: " + this.mana + "/" + this.manapool + " HP: " + this.HP);
 	}

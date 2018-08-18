@@ -170,13 +170,17 @@ async function startGame(message, gameData, sendMessage) {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
 		hand: gameData[gameData.playing].hand,
-		deck: gameData[gameData.playing].deck.length
+		deck: gameData[gameData.playing].deck.length,
+		localBoard : gameData[gameData.playing].board,
+		adversaryBoard : gameData[notPlaying].board
 	});
 	sendMessage(connections[gameData[notPlaying].id], 'start-turn-adversary', {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
 		hand: gameData[gameData.playing].hand.length,
-		deck: gameData[gameData.playing].deck.length
+		deck: gameData[gameData.playing].deck.length,
+		localBoard : gameData[notPlaying].board,
+		adversaryBoard : gameData[gameData.playing].board
 	});
 }
 
@@ -202,13 +206,17 @@ function endTurn(message, gameData, sendMessage) {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
 		hand: gameData[gameData.playing].hand,
-		deck: gameData[gameData.playing].deck.length
+		deck: gameData[gameData.playing].deck.length,
+		localBoard : gameData[gameData.playing].board,
+		adversaryBoard : gameData[notPlaying].board
 	});
 	sendMessage(connections[gameData[notPlaying].id], 'start-turn-adversary', {
 		mana: gameData[gameData.playing].mana,
 		manapool: gameData[gameData.playing].manapool,
 		hand: gameData[gameData.playing].hand.length,
-		deck: gameData[gameData.playing].deck.length
+		deck: gameData[gameData.playing].deck.length,
+		localBoard : gameData[notPlaying].board,
+		adversaryBoard : gameData[gameData.playing].board
 	});
 }
 
@@ -229,6 +237,7 @@ async function playCard(message, gameData, sendMessage) {
 	if (!isCardValid(index, gameData, player, sendMessage))
 		return;
 
+	let error = 0;
 	switch (card.type) {
 		case 'creature' : 
 			await playCreatureCard(gameData, card, message.index, player, message, sendMessage);
@@ -237,8 +246,13 @@ async function playCard(message, gameData, sendMessage) {
 			playWeapon(gameData, card, player);
 			break;
 		case 'spell' :
-			await playSpellCard(gameData, message, player, card, sendMessage);
+			error = await playSpellCard(gameData, message, player, card, sendMessage);
 			break;
+	}
+
+	if (error == -1) {
+		// error
+		return;
 	}
 	gameData[player].mana -= card.specs.cost;
 	gameData[player].hand.splice(index,1);
@@ -295,7 +309,8 @@ async function playSpellCard(gameData, message, player, card, sendMessage) {
 					let target = handleTarget(gameData, effect.target, message);
 					if (target === false) {
 						console.log('invalid target');
-						return;
+						console.log("22222222222222")
+						return -1;
 					}
 					dmgTarget(potency, target);
 					clearDead(gameData, target, sendMessage)
@@ -801,6 +816,10 @@ function pickRandomTargets(gameData, limit, repetition) {
 		max = gameData.playing.board.length;
 	}
 	else {
+	}
+
+	if (repetition > board.length) {
+		return false;
 	}
 	for (let i = 0; i < repetition; i++) {
 		pick = Math.floor(Math.random() * board.length);

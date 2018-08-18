@@ -206,6 +206,8 @@ connection.onmessage = function(message) {
                 game.mana = json.message.mana;
                 game.hand = json.message.hand;
                 game.localDeck = json.message.deck;
+                game.adversaryBoard = json.message.adversaryBoard;
+                game.localBoard = json.message.localBoard;
                 game.drawGame(writeToConsole);
                 writeToConsole("Your turn!", colors.data);
             }
@@ -214,6 +216,8 @@ connection.onmessage = function(message) {
                 game.adversaryMana = json.message.mana;
                 game.adversaryDeck = json.message.deck;
                 game.adversaryHand = json.message.hand;
+                game.adversaryBoard = json.message.adversaryBoard;
+                game.localBoard = json.message.localBoard;
                 game.drawGame(writeToConsole);
                 writeToConsole("Waiting on adversary...", colors.data);
             }
