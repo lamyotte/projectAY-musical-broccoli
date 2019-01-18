@@ -1,0 +1,13 @@
+version: "2"
+services:
+  main_service:
+    build: main_service
+    working_dir: /usr/src/app/
+    environment:
+      - NODE_ENV=production
+    expose:
+      - "8082"
+    command: "node server.js"
+    ports:
+      - "8082:8082"
+    restart: always 
