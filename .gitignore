@@ -1,6 +1,7 @@
 #db
 config.json
 server_services/main_service/ay-game-db/
+ay-game-db
 
 
 # Logs
@@ -64,3 +65,8 @@ typings/
 
 # next.js build output
 .next
+
+# OTher
+package-lock.json
+.DS_Store
+.vscode
