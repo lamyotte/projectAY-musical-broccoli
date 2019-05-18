@@ -1,10 +1,11 @@
 FROM node:10
 
 RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/main_service
 
-COPY package.json /usr/src/app/
+COPY main_service/package.json /usr/src/app/main_service
 RUN npm install
-COPY . /usr/src/app
+COPY ./main_service /usr/src/app/main_service
+COPY ./database /usr/src/app/main_service/database
 
 EXPOSE 8082
