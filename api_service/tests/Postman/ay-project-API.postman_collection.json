@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "e3deda20-eff1-4753-b82e-0d82f5d19eca",
+		"name": "ay-project-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sign-In",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"Livvy\",\n\t\"password\" : \"AAAaaa111\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/signin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Decks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/users/{{user}}/decks",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{user}}",
+						"decks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Profile",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}/users/{{user}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"{{user}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start Game",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"user\": \"{{user}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/token/game/request",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"token",
+						"game",
+						"request"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9bd74724-2e87-46ed-bf8c-fcc0825d5ca5",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b720e174-84c8-46ba-9214-2822f78180ed",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "06b59a59-30e8-4f3f-bae8-8fb2aa2ed8c7",
+			"key": "host",
+			"value": "localhost:3000",
+			"type": "string"
+		},
+		{
+			"id": "3c88d9d4-cdf2-4fe5-85a1-485344dd6950",
+			"key": "user",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}

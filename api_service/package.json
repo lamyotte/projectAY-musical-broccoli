@@ -1,0 +1,21 @@
+{
+  "name": "api_service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "api-test": "newman run tests/Postman/ay-project-API.postman_collection.json",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/hapi": "^18.3.1",
+    "sequelize": "^5.8.6"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.2",
+    "newman": "^4.4.1"
+  }
+}
