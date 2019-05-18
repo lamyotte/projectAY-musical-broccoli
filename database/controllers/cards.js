@@ -7,7 +7,7 @@ module.exports = {
       .then(formatter.formatMany);
   },
   getById(id) {
-    return Card.findById(id)
+    return Card.findByPk(id)
       .then(formatter.formatOne);
   },
   search(params) {

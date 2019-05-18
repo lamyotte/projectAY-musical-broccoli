@@ -1,0 +1,19 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "sequelize db:migrate \n node creationScripts/generate.js all"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^7.11.0",
+    "sequelize": "^5.8.6"
+  },
+  "devDependencies": {
+    "make-runnable": "^1.3.6"
+  }
+}

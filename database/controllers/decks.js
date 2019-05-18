@@ -9,7 +9,8 @@ function format(decks) {
   let formattedElements =[];
   for(let i = 0; i < decks.length ; i++) {
     formattedElements[i] = decks[i].dataValues;
-    formattedElements[i].Cards = formatCards(formattedElements[i].Cards);
+    if (formattedElements[i].hasOwnProperty('Cards'))
+      formattedElements[i].Cards = formatCards(formattedElements[i].Cards);
     formattedElements[i].Job = decks[i].Job.dataValues;
   }
   return formattedElements;
@@ -75,5 +76,18 @@ module.exports = {
         }, Deck_Card]
       })
       .then(formatOne);
+  },
+  getByPlayerDecksOnly(playerId) {
+    return Deck
+      .findAll({
+        where: {
+          PlayerId : playerId
+        },
+        include: [{
+          model: Job,
+          as: 'Job'
+        }]
+      })
+      .then(format);
   }
 };

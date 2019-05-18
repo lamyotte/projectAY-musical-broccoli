@@ -1,11 +1,13 @@
 const players = [
 	{
 		gamerTag: "Livvy",
-		MMR: 25
+		MMR: 25,
+		password: "AAAaaa111"
 	},
 	{
 		gamerTag: "Phil714",
-		MMR: 25
+		MMR: 25,
+		password: "AAAaaa111"
 	}
 
 

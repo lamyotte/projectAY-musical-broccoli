@@ -9,7 +9,10 @@ function formatMany(elements) {
 }
 
 function formatOne(element) {
-  return element.dataValues;
+  if (element)
+    return element.dataValues;
+  else
+    return {};
 }
 
 module.exports = {

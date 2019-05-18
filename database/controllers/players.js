@@ -20,13 +20,22 @@ module.exports = {
       .catch(error => console.log(error));
   },
   getById(id) {
-    return Player.findById(id)
+    return Player.findByPk(id)
       .then(formatOne);
   },
   getByTag(tag) {
     return Player.findOne({
         where: {
           gamerTag: tag
+        }
+    })
+    .then(formatOne);
+  },
+  getByTagPassword(tag, password) {
+    return Player.findOne({
+        where: {
+          gamerTag: tag,
+          password: password
         }
     })
     .then(formatOne);

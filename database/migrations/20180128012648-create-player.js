@@ -11,6 +11,9 @@ module.exports = {
       gamerTag: {
         type: Sequelize.STRING
       },
+      password: {
+        type: Sequelize.STRING
+      },
       MMR: {
         type: Sequelize.INTEGER
       },

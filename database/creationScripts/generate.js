@@ -12,6 +12,10 @@ const Player = require('../models').Player;
 
 const Deck = require('../models').Deck;
 
+const MatchLog = require('../models').MatchLog;
+
+const Connection = require('../models').Connection;
+
 function formatMany(object) {
   let formattedObjects =[];
   for(let i = 0; i < object.length ; i++) {
@@ -40,7 +44,7 @@ function createJobs() {
 function createPlayers() {
 	return Player.bulkCreate(players)
 		.then((res) => {
-			return Player.all();
+			return Player.findAll();
 		})
 		.then((res) => {
 			console.log(formatMany(res));
@@ -64,13 +68,31 @@ function createDecks() {
 }
 
 function addCardsToDeck(){
-	return Deck.all()
+	return Deck.findAll()
 	.then((decks) => {
 		decks[1].addCard([21,22,23,24,26,20,25,4,6,16,17,18,19,10,14]);
 		decks[1].addCard([21,22,23,24,26,20,25,4,6,16,17,18,19,10,14]);
 		decks[0].addCard([27,28,29,30,42,34,35,36,37,38,2,4,39,40,11]);
 		decks[0].addCard([27,28,29,30,42,34,35,36,37,38,2,4,39,40,11]);
 	})
+}
+
+function generateMatchLog(){
+	return MatchLog.bulkCreate([{
+		matchToken: "test-game-token",
+		player1: 1,
+		player2: 2
+	}])
+}
+
+function generateConnection(){
+	return Connection.bulkCreate([{
+		token: "test-connection-token-p1" ,
+		PlayerId: 1
+	},{
+		token: "test-connection-token-p2" ,
+		PlayerId: 2
+	}])
 }
 
 function all() {
@@ -86,6 +108,12 @@ function all() {
 	})
 	.then(() => {
 		return addCardsToDeck();
+	})
+	.then(() => {
+		return generateConnection();
+	})
+	.then(() => {
+		return generateMatchLog();
 	})
 }
 
