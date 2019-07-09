@@ -2,41 +2,36 @@ const Connection = require('../models').Connection;
 const formatOne= require('./formatter').formatOne;
 const formatMany= require('./formatter').formatMany;
 
-function generateToken(length) {
-  let token           = '';
-  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let charactersLength = characters.length;
-  for ( var i = 0; i < length; i++ ) {
-    token += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return token;
-}
-
 module.exports = {
-  create(playerId) {
-    let token = generateToken(12)
+  create(player) {
     return Connection
       .create({
-    		PlayerId: playerId,
-    		token: token
+    		gamerTag: tag,
+    		MMR: mmr
       })
       .then(formatOne)
       .catch(error => console.log(error));
   },
-  getByToken(token) {
-    return Connection.findOne({
-      where: {
-        token: token
-      }
-    })
+  list() {
+    return Player
+      .all()
+      .then(formatMany)
+      .catch(error => console.log(error));
+  },
+  getById(id) {
+    return Player.findByPk(id)
       .then(formatOne);
   },
-  getByPlayer(player) {
-    return Connection.findOne({
+  getByTag(tag) {
+    return Player.findOne({
         where: {
-          PlayerId: player
+          gamerTag: tag
         }
     })
     .then(formatOne);
+  },
+  search(params) {
+    return Player.findAll({where: params})
+    .then(formatMany);
   }
 };

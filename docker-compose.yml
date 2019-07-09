@@ -21,10 +21,10 @@ services:
     environment:
       - NODE_ENV=production
     expose:
-      - "3000"
+      - "3002"
     command: "npm start"
     ports:
-      - "3000:3000"
+      - "3002:3002"
     restart: always 
     volumes:
       - /usr/src/app/database

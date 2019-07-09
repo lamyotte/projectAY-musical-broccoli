@@ -22,6 +22,7 @@ var connections = {};
 var GameStatus = Object.freeze({'swaping':1, "playing":2, "ending":3})
 
 function initGame(player1, player2) {
+	// Save connections locally
 	connections[player1.id] = player1.connection;
 	connections[player2.id] = player2.connection;
 
@@ -1300,7 +1301,7 @@ function addCardsToHand(player, nb=1) {
 }
 
 function sendMessage(connection, command, message) {
-	connection.sendUTF(JSON.stringify({
+	connection.send(JSON.stringify({
 			issuer: 'game-manager',
             message: message,
             command: command

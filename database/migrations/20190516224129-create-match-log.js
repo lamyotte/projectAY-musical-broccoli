@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('MatchLogs', {
+    return queryInterface.createTable("MatchLogs", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,22 +12,35 @@ module.exports = {
         type: Sequelize.STRING
       },
       status: {
-        type: Sequelize.ENUM(['ON-GOING', 'ARCHIVED']),
-        defaultValue: 'ON-GOING'
-
+        type: Sequelize.ENUM(["ON-GOING", "ARCHIVED"]),
+        defaultValue: "ON-GOING"
       },
       player1: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Players',
-          key: 'id'
+          model: "Players",
+          key: "id"
         }
       },
       player2: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Players',
-          key: 'id'
+          model: "Players",
+          key: "id"
+        }
+      },
+      deck1: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Decks",
+          key: "id"
+        }
+      },
+      deck2: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Decks",
+          key: "id"
         }
       },
       createdAt: {
@@ -41,6 +54,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('MatchLogs');
+    return queryInterface.dropTable("MatchLogs");
   }
 };
