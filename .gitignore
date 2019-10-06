@@ -3,6 +3,8 @@ config.json
 server_services/main_service/ay-game-db/
 ay-game-db
 
+#
+.vscode
 
 # Logs
 logs

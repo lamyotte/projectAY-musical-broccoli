@@ -97,7 +97,7 @@ wsServer.on("connection", function(connection) {
  * @param  {number} id         the id of the connection
  */
 function startGame(connection, request, id) {
-  connection.sendUTF(
+  connection.send(
     JSON.stringify({
       command: "sys",
       message: "Player info received, matching player..."
@@ -116,7 +116,7 @@ function startGame(connection, request, id) {
       player2: opponent.data
     };
     //Send game details to waiting oponent
-    connections[opponent.ID].sendUTF(
+    connections[opponent.ID].send(
       JSON.stringify({
         command: "startGame",
         opData: request.data,
@@ -125,7 +125,7 @@ function startGame(connection, request, id) {
       })
     );
     //Send game details to current connection
-    connection.sendUTF(
+    connection.send(
       JSON.stringify({
         command: "startGame",
         opData: opponent.data,

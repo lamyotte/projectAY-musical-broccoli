@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       localId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER
       },
       JobId: {

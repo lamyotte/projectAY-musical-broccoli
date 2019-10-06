@@ -10,4 +10,4 @@ COPY ./database /usr/src/app/database
 
 RUN cd /usr/src/app/database && npm install
 
-EXPOSE 8082
+EXPOSE 8084

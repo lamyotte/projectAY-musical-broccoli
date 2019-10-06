@@ -53,11 +53,13 @@ function createDecks() {
   return Deck.bulkCreate([
     {
       PlayerId: 1,
-      JobId: 1
+      JobId: 1,
+      localId: 1
     },
     {
       PlayerId: 2,
-      JobId: 2
+      JobId: 2,
+      localId: 1
     }
   ]).then(deck => {
     console.log(deck);
