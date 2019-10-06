@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Connections', {
+    return queryInterface.createTable("Connections", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,27 +16,30 @@ module.exports = {
         type: Sequelize.STRING
       },
       lastAccessed: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("NOW()")
       },
       PlayerId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Players',
-          key: 'id'
+          model: "Players",
+          key: "id"
         },
         allowNull: false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("NOW()")
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("NOW()")
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Connections');
+    return queryInterface.dropTable("Connections");
   }
 };

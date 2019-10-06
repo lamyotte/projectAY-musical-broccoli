@@ -36,6 +36,8 @@ function originIsAllowed(origin) {
   return true;
 }
 
+function validateToken() {}
+
 wsServer.on("connection", function(connection) {
   // Verifying origin of request
   if (!originIsAllowed(connection.origin)) {
@@ -43,6 +45,12 @@ wsServer.on("connection", function(connection) {
     console.log(
       new Date() + " Connection from origin " + connection.origin + " rejected."
     );
+    return;
+  }
+
+  if (!validateToken(connection.origin)) {
+    connection.reject();
+    console.log(new Date() + " Connection token rejected.");
     return;
   }
 

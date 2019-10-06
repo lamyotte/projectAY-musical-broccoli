@@ -4,7 +4,7 @@ const matchlogs = require("./database/controllers/matchlogs");
 
 function connect(connection, message) {
   players
-    .getByTag(message.tag)
+    .getByTag(message.gamerTag)
     .then(res => {
       sendMessage(connection, res);
     })
