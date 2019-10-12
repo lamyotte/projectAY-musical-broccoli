@@ -3,6 +3,10 @@ const decks = require('./database/controllers/decks');
 const cards = require('./database/controllers/cards');
 const deck_card = require('./database/controllers/deck_card');
 
+const pino = require('pino')()
+
+const logger = pino.child({ source: 'game_manager' })
+
 const STARTING_CARDS_NUMBER_FIRST = 3; 
 const STARTING_CARDS_NUMBER_SECOND = 4; 
 const MAX_BOARD_SIZE = 7;
@@ -20,6 +24,11 @@ var lastId = 0;
 var connections = {};
 
 var GameStatus = Object.freeze({'swaping':1, "playing":2, "ending":3})
+
+function updateConnection(playerId, connection) {
+	logger.info(`Connection for ${playerId} was updated`)
+	connections[playerId] = connection;
+}
 
 function initGame(player1, player2) {
 	// Save connections locally
@@ -82,21 +91,30 @@ function initGame(player1, player2) {
 		sendMessage(connections[player1.id], 'init-game', {
 			id: lastId,
 			local: {
+				id: gameData.player1.id,
 				tag: gameData.player1.tag,
-				hand: gameData.player1.hand
+				hand: gameData.player1.hand,
+				deck: gameData.player1.deck.length
 			},
 			adversary: {
-				tag : gameData.player2.tag
+				tag : gameData.player2.tag,
+				deck: gameData.player2.deck.length,
+				hand: gameData.player2.hand.length,
+
 			}
 		});
 		sendMessage(connections[player2.id], 'init-game', {
 			id: lastId,
 			local: {
+				id: gameData.player2.id,
 				tag: gameData.player2.tag,
-				hand: gameData.player2.hand
+				hand: gameData.player2.hand,
+				deck: gameData.player2.deck.length
 			},
 			adversary: {
-				tag : gameData.player1.tag
+				tag : gameData.player1.tag,
+				deck: gameData.player1.deck.length,
+				hand: gameData.player1.hand.length,
 			}
 		});
 	})
@@ -1301,6 +1319,7 @@ function addCardsToHand(player, nb=1) {
 }
 
 function sendMessage(connection, command, message) {
+	console.log({message, command});
 	connection.send(JSON.stringify({
 			issuer: 'game-manager',
             message: message,
@@ -1344,6 +1363,7 @@ async function route (connection, message) {
 module.exports = {
 	route,
 	initGame,
+	updateConnection,
 	// Exposed for testing purposes
 	swapCards,
 	playCard,

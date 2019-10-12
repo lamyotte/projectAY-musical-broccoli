@@ -1,5 +1,7 @@
-var initGame = require("./game_manager.js").initGame;
+const updateConnection = require("./game_manager.js").updateConnection;
+const initGame = require("./game_manager.js").initGame;
 const connections = require("./database/controllers/connections");
+const matchlogs = require("./database/controllers/matchlogs");
 
 var waitList = {};
 
@@ -8,11 +10,63 @@ async function addWaitingPlayer(connection, message) {
   console.log(message);
   let player = await getPlayerInfos(token);
   if (waitList.hasOwnProperty(gameToken)) {
+    if (waitList[gameToken] == connection) return;
     console.log("Starting game!");
-    initGame(waitList[gameToken], player);
+    let match = await matchlogs.getByToken(gameToken);
+    if (match.status != "LOBBY") return;
+    matchlogs.updateStatus(match.id, "ON-GOING");
+    console.log(match);
+    initGame(
+      {
+        id: match.player1,
+        deckId: match.deck1,
+        connection: waitList[gameToken]
+      },
+      {
+        id: match.player2,
+        deckId: match.deck2,
+        connection: connection
+      }
+    );
     delete waitList[gameToken];
   } else {
-    waitList[gameToken] = player;
+    waitList[gameToken] = connection;
+  }
+}
+
+async function handle_new_connection(connection, message) {
+  let { gameToken, token } = message;
+  let match = await matchlogs.getByToken(gameToken);
+  console.log(match);
+  let player = await getPlayerInfos(token);
+  if (match.status == "ARCHIVED") return; // Game has ended connection impossible
+  if (match.status == "ON-GOING") {
+    updateConnection(player.id, connection);
+    return;
+  }
+  if (waitList.hasOwnProperty(gameToken)) {
+    if (waitList[gameToken].token == token) {
+      waitList[gameToken].connection = connection;
+    } else {
+      initGame(
+        {
+          id: match.player1,
+          deckId: match.deck1,
+          connection: waitList[gameToken].connection
+        },
+        {
+          id: match.player2,
+          deckId: match.deck2,
+          connection: connection
+        }
+      );
+      delete waitList[gameToken];
+    }
+  } else {
+    waitList[gameToken] = {
+      token: token,
+      connection: connection
+    };
   }
 }
 
@@ -40,7 +94,7 @@ function route(connection, message) {
   console.log(message);
   switch (message.command) {
     case "start-game":
-      addWaitingPlayer(connection, message);
+      handle_new_connection(connection, message);
   }
 }
 

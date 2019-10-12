@@ -1,4 +1,4 @@
-version: '3.1'
+version: "3.1"
 services:
   main_service:
     build:
@@ -11,9 +11,21 @@ services:
     ports:
       - "8084:8084"
     restart: always
-  
+
+  matchmaker:
+    build:
+      context: .
+      dockerfile: ./matchmaking_service/Dockerfile
+    working_dir: /usr/src/app/matchmaking_service
+    environment:
+      NODE_ENV: production
+    command: "node server.js"
+    ports:
+      - "8083:8083"
+    restart: always
+
   api_service:
-    build: 
+    build:
       context: .
       dockerfile: ./api_service/Dockerfile
     working_dir: /usr/src/app/api_service
@@ -22,10 +34,10 @@ services:
     command: "npm start"
     ports:
       - "3002:3002"
-    restart: always 
+    restart: always
     volumes:
       - /usr/src/app/database
-  
+
   database:
     image: postgres
     restart: always

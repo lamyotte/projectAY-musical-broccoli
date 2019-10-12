@@ -55,7 +55,7 @@ wsServer.on("connection", function(connection) {
     // 1) Queue for game
     let request = JSON.parse(message);
     // 1) Get player and validate token
-    player = validatToken(request.id, request.token);
+    player = await validatToken(request.token);
     if (player === false)
       connection.send(
         JSON.stringify({
@@ -80,8 +80,8 @@ wsServer.on("connection", function(connection) {
   });
 });
 
-async function validatToken(playerId, token) {
-  player = await Connection.getByPlayerToken(playerId, token);
+async function validatToken(token) {
+  player = await Connection.getByPlayerToken(token);
   if (!player.hasOwnProperty("id")) return false;
   return player;
 }

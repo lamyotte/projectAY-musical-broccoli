@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     "MatchLog",
     {
       matchToken: DataTypes.STRING,
-      status: DataTypes.ENUM(["ON-GOING", "ARCHIVED"])
+      status: DataTypes.ENUM(["ON-GOING", "ARCHIVED", "LOBBY"])
     },
     {}
   );

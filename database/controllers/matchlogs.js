@@ -32,6 +32,29 @@ module.exports = {
         matchtoken: token,
         [Op.or]: [{ player1: playerId }, { player2: playerId }]
       }
-    }).then(formatOne);
+    })
+      .then(formatOne)
+      .catch(error => console.log(error));
+  },
+  getByToken(token) {
+    return MatchLog.findOne({
+      where: {
+        matchToken: token
+      }
+    })
+      .then(formatOne)
+      .catch(error => console.log(error));
+  },
+  updateStatus(id, status) {
+    return MatchLog.update(
+      { status: status },
+      {
+        where: {
+          id: id
+        }
+      }
+    )
+      .then(formatOne)
+      .catch(error => console.log(error));
   }
 };

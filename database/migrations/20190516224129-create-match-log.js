@@ -12,10 +12,11 @@ module.exports = {
         type: Sequelize.STRING
       },
       status: {
-        type: Sequelize.ENUM(["ON-GOING", "ARCHIVED"]),
-        defaultValue: "ON-GOING"
+        type: Sequelize.ENUM(["ON-GOING", "ARCHIVED", "LOBBY"]),
+        defaultValue: "LOBBY"
       },
       player1: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
           model: "Players",
@@ -23,6 +24,7 @@ module.exports = {
         }
       },
       player2: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
           model: "Players",
@@ -30,6 +32,7 @@ module.exports = {
         }
       },
       deck1: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
           model: "Decks",
@@ -37,9 +40,18 @@ module.exports = {
         }
       },
       deck2: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
           model: "Decks",
+          key: "id"
+        }
+      },
+      PlayerId: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Players",
           key: "id"
         }
       },

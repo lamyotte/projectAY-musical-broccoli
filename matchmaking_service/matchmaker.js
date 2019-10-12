@@ -14,6 +14,8 @@ function matchmake() {
   }
 }
 async function initGame(player1, player2) {
+  console.log({ player1, player2 });
+  console.log("1111111111111111111111111111111111111");
   let log = await matchlogs.create(
     player1.player.id,
     player2.player.id,
